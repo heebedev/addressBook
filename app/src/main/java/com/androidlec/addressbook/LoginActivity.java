@@ -34,9 +34,6 @@ public class LoginActivity extends AppCompatActivity {
 
         btn_login.setOnClickListener(onClickListener);
         tv_register.setOnClickListener(onClickListener);
-
-        Log.v("LoginActivity", "login");
-
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
