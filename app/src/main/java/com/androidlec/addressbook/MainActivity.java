@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +20,7 @@ import android.widget.SearchView;
 
 
 public class MainActivity extends AppCompatActivity {
+
     private ActionBar actionBar;
 
     private void init() {
@@ -50,10 +52,8 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 selected_tag_idx = spinner_tags.getSelectedItemPosition();
                 Toast.makeText(MainActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
-
             }
 
             @Override
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 액션바
         actionBar.setTitle("내 주소록");
+        actionBar.setElevation(0);
 
 
     }
@@ -88,17 +89,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_search:
-                Toast.makeText(this, "search", Toast.LENGTH_SHORT).show();
-                break;
             case R.id.menu_optionTag:
-                Toast.makeText(this, "menu_optionTag", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
                 break;
             case R.id.menu_logout:
                 Toast.makeText(this, "menu_logout", Toast.LENGTH_SHORT).show();
-                break;
-            case android.R.id.home:
-                Toast.makeText(this, "home", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 return super.onOptionsItemSelected(item);

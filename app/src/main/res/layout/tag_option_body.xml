@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:src="@drawable/ic_tag_red"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_red"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="빨간색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:id="@+id/tag_option_iv_image_orange"
+            android:src="@drawable/ic_tag_orange"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_orange"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="주황색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:id="@+id/tag_option_iv_image_yellow"
+            android:src="@drawable/ic_tag_yellow"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_yellow"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="노란색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:id="@+id/tag_option_iv_image_green"
+            android:src="@drawable/ic_tag_green"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_green"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="초록색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:id="@+id/tag_option_iv_image_blue"
+            android:src="@drawable/ic_tag_blue"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_blue"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="파란색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:id="@+id/tag_option_iv_image_purple"
+            android:src="@drawable/ic_tag_purple"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_purple"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="보라색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+        <ImageView
+            android:id="@+id/tag_option_iv_image_gray"
+            android:src="@drawable/ic_tag_gray"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <EditText
+            android:id="@+id/tag_option_et_name_gray"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="회색"
+            android:layout_marginLeft="4dp"
+            android:textColor="#5a5a5a"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>
