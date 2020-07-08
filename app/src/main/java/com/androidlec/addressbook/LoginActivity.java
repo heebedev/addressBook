@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -40,7 +41,6 @@ public class LoginActivity extends AppCompatActivity {
         // 클릭 리스너
         btn_login.setOnClickListener(onClickListener);
         tv_register.setOnClickListener(onClickListener);
-
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
