@@ -2,9 +2,12 @@ package com.androidlec.addressbook;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -28,5 +31,23 @@ public class LoginActivity extends AppCompatActivity {
 
         init();
 
+        btn_login.setOnClickListener(onClickListener);
+        tv_register.setOnClickListener(onClickListener);
+
     }
+
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.login_btn_login:
+                    Toast.makeText(LoginActivity.this, "로그인액션", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.login_tv_register:
+                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                    break;
+            }
+        }
+    };
+
 }
