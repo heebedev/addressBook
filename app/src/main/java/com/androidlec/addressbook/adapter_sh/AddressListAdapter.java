@@ -3,9 +3,6 @@ package com.androidlec.addressbook.adapter_sh;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +16,6 @@ import com.androidlec.addressbook.dto_sh.Address;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.net.URL;
 import java.util.ArrayList;
 
 public class AddressListAdapter extends BaseAdapter {
@@ -87,7 +83,6 @@ public class AddressListAdapter extends BaseAdapter {
         //Tag color 보여주기
         Resources res = null;
         String[] tags = data.get(position).getAtag().split(",");
-        Log.v("status", Integer.toString(tags.length));
         TypedArray tagimages = MainActivity.tagImages;
 
         switch(tags.length) {

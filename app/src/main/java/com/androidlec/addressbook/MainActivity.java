@@ -3,7 +3,6 @@ package com.androidlec.addressbook;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -13,30 +12,24 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
 import com.androidlec.addressbook.dto_sh.Address;
 import com.androidlec.addressbook.network_sh.NetworkTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
-
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    String TAG = "Log Chk : ";
+    LJH_data ljh_data; // 아이디값 불러오는 클래스.
+
     private ActionBar actionBar;
-
-    Log log;
-
-    private void init() {
-        actionBar = getSupportActionBar();
-    }
 
     //스피너
     private Spinner spinner_tags;
@@ -60,21 +53,37 @@ public class MainActivity extends AppCompatActivity {
     public static TypedArray tagImages;
 
 
+    private void init() {
+        Resources res = getResources();
+
+        actionBar = getSupportActionBar();
+
+        //Log.v("MainActivity.java", LJH_data.getLoginId());
+
+        spinner_tags = findViewById(R.id.main_sp_taglist);
+        spinnerNames = res.getStringArray(R.array.maintaglist);
+        tagImages = res.obtainTypedArray(R.array.tag_array);
+
+
+        listView = findViewById(R.id.main_lv_addresslist);
+
+        fladdBtn = findViewById(R.id.main_fab_add);
+
+        centIP = "192.168.0.138";
+
+        // 태그 불러오기.
+        onTagList();
+
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Resources res = getResources();
-
         // 초기화
         init();
-
-        //스피너
-        spinner_tags = findViewById(R.id.main_sp_taglist);
-
-        spinnerNames = res.getStringArray(R.array.maintaglist);
-        tagImages = res.obtainTypedArray(R.array.tag_array);
 
 
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
@@ -84,7 +93,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selected_tag_idx = spinner_tags.getSelectedItemPosition();
-                Toast.makeText(MainActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
+
+                if (selected_tag_idx == 0) {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp";
+                } else {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?aTag=" + selected_tag_idx;
+                }
+                connectGetData();
+
             }
 
             @Override
@@ -96,16 +112,7 @@ public class MainActivity extends AppCompatActivity {
         //리스트뷰
         data = new ArrayList<Address>();
 
-        //리스트뷰 데이터 구성
-        centIP = "192.168.0.138";
-        urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp";
-        listView = findViewById(R.id.main_lv_addresslist);
-        connectGetData();
-
-
-
         //플로팅버튼
-        fladdBtn = findViewById(R.id.main_fab_add);
         fladdBtn.setOnClickListener(onClickListener);
 
         // 액션바
@@ -146,15 +153,14 @@ public class MainActivity extends AppCompatActivity {
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            // submit클릭 후 액션
-            Log.v("Chance", "onQueryTextSubmit : " + query);
+            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?search=" + query;
+            connectGetData();
             return false;
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
-            // 텍스트 입력할 때마다 액션
-            Log.v("Chance", "onQueryTextChange : " + newText);
+            //안함
             return false;
         }
     };
@@ -181,6 +187,46 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }  // connectGetData
+
+
+    private void onTagList() {
+        Log.v(TAG, "onTagList()()");
+
+        urlAddr = "http://192.168.0.178:8080/Test/tagList.jsp?";
+        urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
+
+        connectTagListData();
     }
 
-}
+
+    // 태그 리스트 불러오기.
+    private void connectTagListData() {
+        Log.v(TAG, "connectTagListData()");
+
+        try {
+            LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
+            Object obj = tagListNetworkTask.execute().get();
+            ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
+
+            tNames.add(0, "전체보기");
+
+            spinnerNames[1] = tNames.get(0);
+            spinnerNames[2] = tNames.get(1);
+            spinnerNames[3] = tNames.get(2);
+            spinnerNames[4] = tNames.get(3);
+            spinnerNames[5] = tNames.get(4);
+            spinnerNames[6] = tNames.get(5);
+            spinnerNames[7] = tNames.get(6);
+
+            Log.v(TAG, "tag 대체 완료.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }  // connectTagListData
+
+
+}//----
+
