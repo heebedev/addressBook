@@ -3,21 +3,20 @@ package com.androidlec.addressbook;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -39,7 +38,7 @@ public class AddActivity extends AppCompatActivity {
 
     private Spinner spinner_tags;
     String[] spinnerNames;
-    int[] spinnerImages;
+    TypedArray spinnerImages;
     int selected_tag_idx = 0;
 
     // 카메라 관련
@@ -49,7 +48,11 @@ public class AddActivity extends AppCompatActivity {
 
     private Uri image_uri;
 
+
+
     private void init() {
+        Resources res = getResources();
+
         tvbtregister = findViewById(R.id.tvbt_addAddress_register);
         tvbtcancle = findViewById(R.id.tvbt_addAddress_cancel);
         ivAddImage = findViewById(R.id.iv_addAddress_image);
@@ -60,8 +63,8 @@ public class AddActivity extends AppCompatActivity {
         et_comment = findViewById(R.id.et_addAddress_cmt);
 
         spinner_tags = findViewById(R.id.add_sp_taglist);
-        spinnerNames = new String[]{"태그없음", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "회색"};
-        spinnerImages = new int[]{R.drawable.ic_tag_black, R.drawable.ic_tag_red, R.drawable.ic_tag_orange, R.drawable.ic_tag_yellow, R.drawable.ic_tag_green, R.drawable.ic_tag_blue, R.drawable.ic_tag_purple, R.drawable.ic_tag_gray};
+        spinnerNames = res.getStringArray(R.array.addaddresstaglist);
+        spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
     }
 
@@ -110,6 +113,7 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
+
         // 키보드 화면 가림막기
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
@@ -117,7 +121,12 @@ public class AddActivity extends AppCompatActivity {
 
         tvbtregister.setOnClickListener(onClickListener);
         tvbtcancle.setOnClickListener(onClickListener);
+
+
+        spinner_tags = findViewById(R.id.add_sp_taglist);
+
         ivAddImage.setOnClickListener(onClickListener);
+
 
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(AddActivity.this, spinnerNames, spinnerImages);
         spinner_tags.setAdapter(customSpinnerAdapter);
