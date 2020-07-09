@@ -95,9 +95,11 @@ public class MainActivity extends AppCompatActivity {
                 selected_tag_idx = spinner_tags.getSelectedItemPosition();
 
                 if (selected_tag_idx == 0) {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp";
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
+                    Log.v("status", urlAddr);
                 } else {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?aTag=" + selected_tag_idx;
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + selected_tag_idx;
+                    Log.v("status", urlAddr);
                 }
                 connectGetData();
 
@@ -153,7 +155,8 @@ public class MainActivity extends AppCompatActivity {
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?search=" + query;
+            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid="+ ljh_data.loginId +"&search=" + query;
+            Log.v("status", urlAddr);
             connectGetData();
             return false;
         }
@@ -210,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
             Object obj = tagListNetworkTask.execute().get();
             ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
 
-            tNames.add(0, "전체보기");
 
             spinnerNames[1] = tNames.get(0);
             spinnerNames[2] = tNames.get(1);
