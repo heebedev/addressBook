@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         // 초기화
         init();
 
-
         // 클릭 리스너
         btn_login.setOnClickListener(onClickListener);
         tv_register.setOnClickListener(onClickListener);
@@ -77,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
         Log.v(TAG, urlAddr);
 
         connectLoginData();
-        Log.v(TAG, "connectLoginData()");
     }
 
     private void connectLoginData(){
