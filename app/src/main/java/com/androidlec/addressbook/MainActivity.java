@@ -51,6 +51,58 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v("MainActivity.java", LJH_data.getLoginId());
 
+        Spinner_List();
+
+        // 초기화
+        init();
+
+        // 액션바
+        actionBar.setTitle("내 주소록");
+        actionBar.setElevation(0);
+
+        //floating Button
+        fladdBtn.setOnClickListener(onClickListener);
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Spinner_List();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem menuItem = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setSubmitButtonEnabled(true);
+
+        searchView.setOnQueryTextListener(onQueryTextListener);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_optionTag:
+                startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
+                break;
+            case R.id.menu_logout:
+                ljh_data.setLoginId("");
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void Spinner_List() {
         spinner_tags = findViewById(R.id.main_sp_taglist);
         fladdBtn = findViewById(R.id.main_fab_add);
 
@@ -77,47 +129,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-        // 초기화
-        init();
-
-        // 액션바
-        actionBar.setTitle("내 주소록");
-        actionBar.setElevation(0);
-
-        //floating Button
-        fladdBtn.setOnClickListener(onClickListener);
-
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem menuItem = menu.findItem(R.id.menu_search);
-        SearchView searchView = (SearchView) menuItem.getActionView();
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.setSubmitButtonEnabled(true);
-
-        searchView.setOnQueryTextListener(onQueryTextListener);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_optionTag:
-                startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
-                break;
-            case R.id.menu_logout:
-                Toast.makeText(this, "menu_logout", Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {

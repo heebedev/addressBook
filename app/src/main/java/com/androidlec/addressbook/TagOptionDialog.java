@@ -17,6 +17,7 @@ public class TagOptionDialog extends AppCompatActivity {
 
     String TAG = "Log Chk : ";
     String urlAddr;
+    String tag1, tag2, tag3, tag4, tag5, tag6, tag7;
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
     private Button btn_cancel, btn_submit;
     private EditText et_red, et_orange, et_yellow, et_green, et_blue, et_purple, et_gray;
@@ -56,7 +57,8 @@ public class TagOptionDialog extends AppCompatActivity {
                     finish();
                     break;
                 case R.id.dialog_tag_option_btn_submit:
-//                    onChangeTagName();
+                    onChangeTagName();
+
                     break;
             }
         }
@@ -74,6 +76,26 @@ public class TagOptionDialog extends AppCompatActivity {
         connectTagListData();
     }
 
+    private void onChangeTagName(){
+        Log.v(TAG, "onChangeTagName()()");
+
+        tag1 = et_red.getText().toString();
+        tag2 = et_orange.getText().toString();
+        tag3 = et_yellow.getText().toString();
+        tag4 = et_green.getText().toString();
+        tag5 = et_blue.getText().toString();
+        tag6 = et_purple.getText().toString();
+        tag7 = et_gray.getText().toString();
+
+        urlAddr = "http://192.168.0.178:8080/Test/tagChange.jsp?";
+        urlAddr = urlAddr + "id=" + ljh_data.getLoginId() + "&tag1=" + tag1 + "&tag2=" + tag2 + "&tag3=" + tag3 + "&tag4=" + tag4 + "&tag5=" + tag5 + "&tag6=" + tag6 + "&tag7=" + tag7;
+
+        Log.v(TAG, urlAddr);
+
+        // 태그명 바꾸기.
+        connectTagChangeData();
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //바깥레이어 클릭시 안닫히게
@@ -86,7 +108,7 @@ public class TagOptionDialog extends AppCompatActivity {
     }
 
 
-    // 태그 리스트 불러오기.
+    // 태그명 불러오기.
     private void connectTagListData() {
         Log.v(TAG, "connectTagListData()");
 
@@ -109,5 +131,20 @@ public class TagOptionDialog extends AppCompatActivity {
         }
     }
 
+
+    // 태그명 바꾸기.
+    private void connectTagChangeData() {
+        Log.v(TAG, "connectTagChangeData()");
+
+        try{
+            LJH_InsertNetworkTask tagChangeNetworkTask = new LJH_InsertNetworkTask(TagOptionDialog.this, urlAddr);
+            tagChangeNetworkTask.execute().get();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        Toast.makeText(this, "태그명이 변경되었습니다.", Toast.LENGTH_SHORT).show();
+        finish();
+    }
 
 }//----

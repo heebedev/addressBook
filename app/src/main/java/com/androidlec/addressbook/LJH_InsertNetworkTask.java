@@ -3,12 +3,14 @@ package com.androidlec.addressbook;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class LJH_InsertNetworkTask extends AsyncTask<Integer, String, Void> { // <Params, Progress, Result> 타입이다. 잊지말고! ,, 백그라운드 값에 따라 리턴값이 달라짐. get() 값도 달라짐.... void 여서 void.
 
+    String TAG = "Log chk : ";
     Context context;
     String mAddr;
     ProgressDialog progressDialog; // 가시적으로도 좋고, 에러 확인 겸 ㅎ
@@ -47,6 +49,8 @@ public class LJH_InsertNetworkTask extends AsyncTask<Integer, String, Void> { //
 
     @Override
     protected Void doInBackground(Integer... integers) {
+        Log.v(TAG, "doInBackground()");
+
         try{
             URL url = new URL(mAddr); // 타고 나가야지.
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); // cast.
