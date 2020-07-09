@@ -2,6 +2,8 @@ package com.androidlec.addressbook;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,9 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText et_id, et_password;
     private Button btn_login;
     private TextView tv_register;
+    String TAG = "Log Chk : ";
+    String urlAddr;
+    String uId, uPw;
 
     private void init() {
         et_id = findViewById(R.id.login_et_id);
@@ -46,10 +51,13 @@ public class LoginActivity extends AppCompatActivity {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.v(TAG, "onClick()");
+
             switch (v.getId()) {
                 case R.id.login_btn_login:
                     Toast.makeText(LoginActivity.this, "로그인액션", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    loginChk();
                     break;
                 case R.id.login_tv_register:
                     startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
@@ -58,4 +66,43 @@ public class LoginActivity extends AppCompatActivity {
         }
     };
 
-}
+    private void loginChk(){
+        Log.v(TAG, "loginChk()");
+
+        uId = et_id.getText().toString();
+        uPw = et_password.getText().toString();
+
+        urlAddr = "http://192.168.0.178:8080/Test/loginChk.jsp?";
+        urlAddr = urlAddr + "id=" + uId + "&pw=" + uPw;
+        Log.v(TAG, urlAddr);
+
+        connectLoginData();
+        Log.v(TAG, "connectLoginData()");
+    }
+
+    private void connectLoginData(){
+        Log.v(TAG, "connectLoginData()");
+
+        try{
+            LJH_LoginNetworkTask loginNetworkTask = new LJH_LoginNetworkTask(LoginActivity.this, urlAddr);
+            int loginChk = loginNetworkTask.execute().get();
+            if(loginChk == 0){
+                Toast.makeText(LoginActivity.this, "회원정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+            }else {
+                // 로그인 완료.
+                loginOk();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void loginOk(){
+        Log.v(TAG, "loginOk()");
+//        Intent intent = new Intent(LoginActivity.this, MAINActivity.class);
+//        intent.putExtra("uId", et_id);
+//        startActivity(intent);
+    }
+
+
+}//----
