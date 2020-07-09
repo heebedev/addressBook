@@ -32,7 +32,7 @@ public class TagOptionDialog extends AppCompatActivity {
         et_purple = findViewById(R.id.tag_option_et_name_purple);
         et_gray = findViewById(R.id.tag_option_et_name_gray);
 
-        // 태그 불러오
+        // 태그 불러오기.
         onTagList();
     }
 
@@ -43,7 +43,6 @@ public class TagOptionDialog extends AppCompatActivity {
 
         // 초기화
         init();
-
 
         btn_cancel.setOnClickListener(onClickListener);
         btn_submit.setOnClickListener(onClickListener);
@@ -73,7 +72,6 @@ public class TagOptionDialog extends AppCompatActivity {
 
         // 태그 리스트 불러오기.
         connectTagListData();
-
     }
 
     @Override

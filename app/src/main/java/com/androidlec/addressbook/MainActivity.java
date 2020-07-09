@@ -19,8 +19,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    String TAG = "Log Chk : ";
+    String urlAddr;
+    LJH_data ljh_data; // 아이디값 불러오는 클래스.
+
+    String tName1, tName2, tName3, tName4, tName5, tName6, tName7;
 
     private ActionBar actionBar;
 
@@ -46,7 +54,10 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags = findViewById(R.id.main_sp_taglist);
         fladdBtn = findViewById(R.id.main_fab_add);
 
-        spinnerNames = new String[]{"전체보기", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "회색"};
+        // 태그 불러오기.
+        onTagList();
+
+        spinnerNames = new String[]{"전체보기", tName1, tName2, tName3, tName4, tName5, tName6, tName7};
         spinnerImages = new int[]{R.drawable.ic_tag_black, R.drawable.ic_tag_red, R.drawable.ic_tag_orange, R.drawable.ic_tag_yellow, R.drawable.ic_tag_green, R.drawable.ic_tag_blue, R.drawable.ic_tag_purple, R.drawable.ic_tag_gray};
 
 
@@ -134,4 +145,40 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-}
+
+    private void onTagList() {
+        Log.v(TAG, "onTagList()()");
+
+        urlAddr = "http://192.168.0.178:8080/Test/tagList.jsp?";
+        urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
+
+        connectTagListData();
+    }
+
+
+    // 태그 리스트 불러오기.
+    private void connectTagListData() {
+        Log.v(TAG, "connectTagListData()");
+
+        try {
+            LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
+            Object obj = tagListNetworkTask.execute().get();
+            ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
+
+            tName1 = tNames.get(0);
+            tName2 = tNames.get(1);
+            tName3 = tNames.get(2);
+            tName4 = tNames.get(3);
+            tName5 = tNames.get(4);
+            tName6 = tNames.get(5);
+            tName7 = tNames.get(6);
+
+            Log.v(TAG, "tName 입력완료.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+}//----
