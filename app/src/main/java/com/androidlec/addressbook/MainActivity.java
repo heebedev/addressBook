@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.v("MainActivity.java", LJH_data.getLoginId());
 
         spinner_tags = findViewById(R.id.main_sp_taglist);
         fladdBtn = findViewById(R.id.main_fab_add);

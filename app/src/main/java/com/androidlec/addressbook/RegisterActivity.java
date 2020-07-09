@@ -4,21 +4,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
     String TAG = "Log Chk : ";
     String urlAddr;
+    String urlAddrTag;
     EditText et_regId, et_regPw, et_regPwOk;
     Button regBtn;
     String regId, regPw, regPwOk;
+    TextView backLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +37,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         regBtn = findViewById(R.id.register_btn_register);
         regBtn.setOnClickListener(onClickListener);
+
+        backLogin = findViewById(R.id.register_tv_login);
+        backLogin.setOnClickListener(onClickListener);
     }
 
 
@@ -39,43 +48,48 @@ public class RegisterActivity extends AppCompatActivity {
         public void onClick(View view) {
             Log.v(TAG, "onClick()");
 
-            blankChk();
+            switch (view.getId()){
+                case R.id.register_tv_login:
+                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.register_btn_register:
+                    blankChk();
+                    break;
+            }
+
         }
     };
 
 
-
-    private void blankChk(){
+    private void blankChk() {
 
         String idChk = et_regId.getText().toString();
         String pwChk = et_regPw.getText().toString();
-        String pwOkChk = et_regPwOk.getText().toString();
 
-        if(idChk.length() == 0){
-            // --------------- 대화상자 띄우기 -------------------------------------------------------------
+        // 회원가입 이메일 포맷체크, 비밀번호 6자리체크
+        if (!Patterns.EMAIL_ADDRESS.matcher(idChk).matches()) {
+            // set error and focus to email edittext
+            // --------------- 대화상자 띄우기 ---------------------------------------------------------
             new AlertDialog.Builder(RegisterActivity.this)
-                    .setTitle("이메일 주소를 기입해주세요.")
+                    .setTitle("올바른 형식의 이메일 주소를 설정해주세요.")
                     .setCancelable(false)
                     .setNegativeButton("확인", null)
                     .show();
-            // ---------------------------------------------------------------------------------------
-        }else if(pwChk.length() == 0){
-            // --------------- 대화상자 띄우기 -------------------------------------------------------------
+            // -------------------------------------------------------------------------------------
+            et_regId.setError("Invalid Email");
+            et_regId.setFocusable(true);
+        } else if (pwChk.length() < 6) {
+            // --------------- 대화상자 띄우기 ---------------------------------------------------------
             new AlertDialog.Builder(RegisterActivity.this)
-                    .setTitle("비밀번호를 기입해주세요.")
+                    .setTitle("비밀번호를 6자 이상으로 설정해주세요.")
                     .setCancelable(false)
                     .setNegativeButton("확인", null)
                     .show();
-            // ---------------------------------------------------------------------------------------
-        }else if(pwOkChk.length() == 0){
-            // --------------- 대화상자 띄우기 -------------------------------------------------------------
-            new AlertDialog.Builder(RegisterActivity.this)
-                    .setTitle("확인용 비밀번호를 기입해주세요.")
-                    .setCancelable(false)
-                    .setNegativeButton("확인", null)
-                    .show();
-            // ---------------------------------------------------------------------------------------
-        }else{
+            // -------------------------------------------------------------------------------------
+            et_regPw.setError("Password length at least 6 characters");
+            et_regPw.setFocusable(true);
+        } else {
             pwChk(); // 패스워드 확인.
         }
     }
@@ -93,7 +107,13 @@ public class RegisterActivity extends AppCompatActivity {
             idDoubleChk(); // 아이디 중복 체크.
             // connectRegData(); // 회원가입 DB 연결.
         }else {
-            Toast.makeText(RegisterActivity.this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            // --------------- 대화상자 띄우기 ---------------------------------------------------------
+            new AlertDialog.Builder(RegisterActivity.this)
+                    .setTitle("비밀번호가 일치하지 않습니다.")
+                    .setCancelable(false)
+                    .setNegativeButton("확인", null)
+                    .show();
+            // -------------------------------------------------------------------------------------
         }
     }
 
@@ -139,28 +159,44 @@ public class RegisterActivity extends AppCompatActivity {
 
         urlAddr = "http://192.168.0.178:8080/Test/register.jsp?";
         urlAddr = urlAddr + "id=" + regId + "&pw=" + regPw;
+
+        urlAddrTag = "";
+        urlAddrTag = "http://192.168.0.178:8080/Test/tagInsert.jsp?id=" + regId;
         Log.v(TAG, urlAddr);
 
         connectRegisterData();
+        connectTagInsertData();
+
         Toast.makeText(RegisterActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
 
         et_regId.setText("");
         et_regPw.setText("");
         et_regPwOk.setText("");
-
-        Log.v(TAG, "connectRegisterData()");
     }
 
 
     private void connectRegisterData(){ // NetworkTask Async 방식. == permission 줘야 하는구나!
+        Log.v(TAG, "connectRegisterData()");
         try {
-            LJH_InsertNetworkTask ljhinsertNetworkTask = new LJH_InsertNetworkTask(RegisterActivity.this, urlAddr);
-            ljhinsertNetworkTask.execute().get();
+            LJH_InsertNetworkTask insertNetworkTask = new LJH_InsertNetworkTask(RegisterActivity.this, urlAddr);
+            insertNetworkTask.execute().get();
 
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+
+    private void connectTagInsertData(){
+        Log.v(TAG, "connectTagInsertData()");
+        try {
+            LJH_InsertNetworkTask tagInsertNetworkTask = new LJH_InsertNetworkTask(RegisterActivity.this, urlAddrTag);
+            tagInsertNetworkTask.execute().get();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
 
 }//---
