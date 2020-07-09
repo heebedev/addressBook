@@ -22,7 +22,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     LayoutInflater inflater;
 
 
-    public CustomSpinnerAdapter(@NonNull Context context,String[] names, TypedArray images) {
+    public CustomSpinnerAdapter(@NonNull Context context, String[] names, TypedArray images) {
         super(context, R.layout.spinner_row);
 
         this.spinnerNames = names;

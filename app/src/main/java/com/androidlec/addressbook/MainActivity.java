@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     //스피너
     private Spinner spinner_tags;
     String[] spinnerNames;
-    TypedArray spinnerImages;
     int selected_tag_idx = 0;
 
 
@@ -60,10 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Log.v("MainActivity.java", LJH_data.getLoginId());
 
-        spinner_tags = findViewById(R.id.main_sp_taglist);
         spinnerNames = res.getStringArray(R.array.maintaglist);
         tagImages = res.obtainTypedArray(R.array.tag_array);
-
+        spinner_tags = findViewById(R.id.main_sp_taglist);
 
         listView = findViewById(R.id.main_lv_addresslist);
 
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         centIP = "192.168.0.138";
 
         // 태그 불러오기.
-        onTagList();
+//        onTagList();
 
     }
 
@@ -111,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         //리스트뷰
         data = new ArrayList<Address>();
+        Spinner_List();
 
         //플로팅버튼
         fladdBtn.setOnClickListener(onClickListener);
@@ -120,6 +119,12 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setElevation(0);
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Spinner_List();
     }
 
     @Override
@@ -142,12 +147,39 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
                 break;
             case R.id.menu_logout:
-                Toast.makeText(this, "menu_logout", Toast.LENGTH_SHORT).show();
+                ljh_data.setLoginId("");
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void Spinner_List() {
+        spinner_tags = findViewById(R.id.main_sp_taglist);
+        fladdBtn = findViewById(R.id.main_fab_add);
+
+        // 태그 불러오기.
+        onTagList();
+
+        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
+        spinner_tags.setAdapter(customSpinnerAdapter);
+
+
+        spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selected_tag_idx = spinner_tags.getSelectedItemPosition();
+                Toast.makeText(MainActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
@@ -209,8 +241,6 @@ public class MainActivity extends AppCompatActivity {
             LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
             Object obj = tagListNetworkTask.execute().get();
             ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
-
-            tNames.add(0, "전체보기");
 
             spinnerNames[1] = tNames.get(0);
             spinnerNames[2] = tNames.get(1);
