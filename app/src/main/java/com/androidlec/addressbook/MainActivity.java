@@ -32,12 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActionBar actionBar;
 
-    Log log;
-
-    private void init() {
-        actionBar = getSupportActionBar();
-    }
-
     //스피너
     private Spinner spinner_tags;
     String[] spinnerNames;
@@ -60,32 +54,49 @@ public class MainActivity extends AppCompatActivity {
     public static TypedArray tagImages;
 
 
+    private void init() {
+        Resources res = getResources();
+
+        actionBar = getSupportActionBar();
+
+
+        spinner_tags = findViewById(R.id.main_sp_taglist);
+        spinnerNames = res.getStringArray(R.array.maintaglist);
+        tagImages = res.obtainTypedArray(R.array.tag_array);
+
+
+        listView = findViewById(R.id.main_lv_addresslist);
+
+        fladdBtn = findViewById(R.id.main_fab_add);
+
+        centIP = "192.168.0.138";
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Resources res = getResources();
-
         // 초기화
         init();
-
-        //스피너
-        spinner_tags = findViewById(R.id.main_sp_taglist);
-
-        spinnerNames = res.getStringArray(R.array.maintaglist);
-        tagImages = res.obtainTypedArray(R.array.tag_array);
 
 
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
         spinner_tags.setAdapter(customSpinnerAdapter);
 
-
         spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selected_tag_idx = spinner_tags.getSelectedItemPosition();
-                Toast.makeText(MainActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
+
+                if (selected_tag_idx == 0) {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp";
+                } else {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?aTag=" + selected_tag_idx;
+                }
+                connectGetData();
+
             }
 
             @Override
@@ -97,16 +108,7 @@ public class MainActivity extends AppCompatActivity {
         //리스트뷰
         data = new ArrayList<Address>();
 
-        //리스트뷰 데이터 구성
-        centIP = "192.168.0.138";
-        urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp";
-        listView = findViewById(R.id.main_lv_addresslist);
-        connectGetData();
-
-
-
         //플로팅버튼
-        fladdBtn = findViewById(R.id.main_fab_add);
         fladdBtn.setOnClickListener(onClickListener);
 
         // 액션바
@@ -147,15 +149,14 @@ public class MainActivity extends AppCompatActivity {
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            // submit클릭 후 액션
-            Log.v("Chance", "onQueryTextSubmit : " + query);
+            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?search=" + query;
+            connectGetData();
             return false;
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
-            // 텍스트 입력할 때마다 액션
-            Log.v("Chance", "onQueryTextChange : " + newText);
+            //안함
             return false;
         }
     };
