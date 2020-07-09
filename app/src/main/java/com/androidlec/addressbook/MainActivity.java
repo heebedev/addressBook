@@ -5,13 +5,19 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
+import com.androidlec.addressbook.dto_sh.Address;
+import com.androidlec.addressbook.network_sh.NetworkTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.util.Log;
@@ -19,21 +25,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private ActionBar actionBar;
 
+    Log log;
+
     private void init() {
         actionBar = getSupportActionBar();
     }
 
+    //스피너
     private Spinner spinner_tags;
     String[] spinnerNames;
-    int[] spinnerImages;
+    TypedArray spinnerImages;
     int selected_tag_idx = 0;
 
+
+    //리스트뷰
+    private ArrayList<Address> data = null;
+    private AddressListAdapter adapter = null;
+    private ListView listView = null;
+
+    //datajsp
+    String centIP, urlAddr;
+
+
+    //플로팅버튼
     FloatingActionButton fladdBtn;
+
+    public static TypedArray tagImages;
 
 
     @Override
@@ -41,15 +65,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Resources res = getResources();
 
+        // 초기화
+        init();
+
+        //스피너
         spinner_tags = findViewById(R.id.main_sp_taglist);
-        fladdBtn = findViewById(R.id.main_fab_add);
 
-        spinnerNames = new String[]{"전체보기", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "회색"};
-        spinnerImages = new int[]{R.drawable.ic_tag_black, R.drawable.ic_tag_red, R.drawable.ic_tag_orange, R.drawable.ic_tag_yellow, R.drawable.ic_tag_green, R.drawable.ic_tag_blue, R.drawable.ic_tag_purple, R.drawable.ic_tag_gray};
+        spinnerNames = res.getStringArray(R.array.maintaglist);
+        tagImages = res.obtainTypedArray(R.array.tag_array);
 
 
-        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, spinnerImages);
+        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
         spinner_tags.setAdapter(customSpinnerAdapter);
 
 
@@ -66,16 +94,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //리스트뷰
+        data = new ArrayList<Address>();
 
-        // 초기화
-        init();
+        //리스트뷰 데이터 구성
+        centIP = "192.168.0.138";
+        urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp";
+        listView = findViewById(R.id.main_lv_addresslist);
+        connectGetData();
+
+
+
+        //플로팅버튼
+        fladdBtn = findViewById(R.id.main_fab_add);
+        fladdBtn.setOnClickListener(onClickListener);
 
         // 액션바
         actionBar.setTitle("내 주소록");
         actionBar.setElevation(0);
-
-        //floating Button
-        fladdBtn.setOnClickListener(onClickListener);
 
 
     }
@@ -132,5 +168,20 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     };
+
+
+    private void connectGetData() {
+        //log.v("status", "connect GetData start");
+        try {
+            NetworkTask networkTask = new NetworkTask(MainActivity.this, urlAddr);
+            Object obj = networkTask.execute().get();
+            data = (ArrayList<Address>) obj;
+            adapter = new AddressListAdapter(MainActivity.this, R.layout.address_list_layout, data);
+            listView.setAdapter(adapter);
+            //log.v("status", "get data 끝");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

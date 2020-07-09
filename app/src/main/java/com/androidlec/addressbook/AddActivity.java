@@ -2,6 +2,8 @@ package com.androidlec.addressbook;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,13 +19,15 @@ public class AddActivity extends AppCompatActivity {
 
     private Spinner spinner_tags;
     String[] spinnerNames;
-    int[] spinnerImages;
+    TypedArray spinnerImages;
     int selected_tag_idx = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
+
+        Resources res = getResources();
 
         tvbtregister = findViewById(R.id.tvbt_addAddress_register);
         tvbtcancle = findViewById(R.id.tvbt_addAddress_cancle);
@@ -35,8 +39,8 @@ public class AddActivity extends AppCompatActivity {
 
         spinner_tags = findViewById(R.id.add_sp_taglist);
 
-        spinnerNames = new String[]{"태그없음", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "회색"};
-        spinnerImages = new int[]{R.drawable.ic_tag_black, R.drawable.ic_tag_red, R.drawable.ic_tag_orange, R.drawable.ic_tag_yellow, R.drawable.ic_tag_green, R.drawable.ic_tag_blue, R.drawable.ic_tag_purple, R.drawable.ic_tag_gray};
+        spinnerNames = res.getStringArray(R.array.addaddresstaglist);
+        spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
 
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(AddActivity.this, spinnerNames, spinnerImages);
