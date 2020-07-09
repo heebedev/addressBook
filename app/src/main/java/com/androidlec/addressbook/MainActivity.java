@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     //스피너
     private Spinner spinner_tags;
     String[] spinnerNames;
-    TypedArray spinnerImages;
     int selected_tag_idx = 0;
 
 
@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton fladdBtn;
 
     public static TypedArray tagImages;
+
+    TextView pre_cmt;
 
 
     private void init() {
@@ -96,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (selected_tag_idx == 0) {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
-                    Log.v("status", urlAddr);
+                    //Log.v("status", urlAddr);
                 } else {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + selected_tag_idx;
-                    Log.v("status", urlAddr);
+                    //Log.v("status", urlAddr);
                 }
                 connectGetData();
 
@@ -120,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
         // 액션바
         actionBar.setTitle("내 주소록");
         actionBar.setElevation(0);
+
+        listView.setOnItemClickListener(lvOnItemClickListener);
 
 
     }
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onQueryTextSubmit(String query) {
             urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid="+ ljh_data.loginId +"&search=" + query;
-            Log.v("status", urlAddr);
+            //Log.v("status", urlAddr);
             connectGetData();
             return false;
         }
@@ -229,6 +233,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }  // connectTagListData
 
+    ListView.OnItemClickListener lvOnItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);;
+
+            if (pre_cmt == null) {
+                pre_cmt = cmt;
+            } else {
+                pre_cmt.setVisibility(View.GONE);
+                pre_cmt = cmt;
+            }
+
+            cmt.setVisibility(View.VISIBLE);
+
+        }
+    };
 }//----
 

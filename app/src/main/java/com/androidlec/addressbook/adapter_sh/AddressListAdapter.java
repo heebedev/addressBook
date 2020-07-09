@@ -10,6 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.androidlec.addressbook.MainActivity;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.dto_sh.Address;
@@ -24,6 +26,15 @@ public class AddressListAdapter extends BaseAdapter {
     private int layout = 0;
     private ArrayList<Address> data = null;
     private LayoutInflater inflater = null;
+
+    public ImageView ivpfimage;
+    public TextView tvname;
+    public TextView tvphone;
+    public TextView tvemail;
+    public ImageView ivpftag1;
+    public ImageView ivpftag2;
+    public ImageView ivpftag3;
+    public TextView tvcmt;
     
 
     private String baseurl = "http://192.168.0.82:8080/Hello/imgs/";
@@ -50,25 +61,32 @@ public class AddressListAdapter extends BaseAdapter {
         return position;
     }
 
+    public void getCmtVisible(int position) {
+
+    }
+
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
 
         if(convertView == null) {
             convertView = inflater.inflate(this.layout, parent, false);
+
         }
 
-        ImageView ivpfimage = convertView.findViewById(R.id.iv_addresslist_pfimage);
-        TextView tvname = convertView.findViewById(R.id.tv_addresslist_name);
-        TextView tvphone = convertView.findViewById(R.id.tv_addresslist_email);
-        TextView tvemail = convertView.findViewById(R.id.tv_addresslist_phone);
-        ImageView ivpftag1 = convertView.findViewById(R.id.iv_addresslist_tag1);
+        ivpfimage = convertView.findViewById(R.id.iv_addresslist_pfimage);
+        tvname = convertView.findViewById(R.id.tv_addresslist_name);
+        tvphone = convertView.findViewById(R.id.tv_addresslist_email);
+        tvemail = convertView.findViewById(R.id.tv_addresslist_phone);
+        ivpftag1 = convertView.findViewById(R.id.iv_addresslist_tag1);
         ImageView ivpftag2 = convertView.findViewById(R.id.iv_addresslist_tag2);
         ImageView ivpftag3 = convertView.findViewById(R.id.iv_addresslist_tag3);
+        TextView tvcmt = convertView.findViewById(R.id.tv_addresslist_cmt);
 
 
         tvname.setText(data.get(position).getAname());
         tvphone.setText(data.get(position).getAphone());
         tvemail.setText(data.get(position).getAemail());
+        tvcmt.setText(data.get(position).getAmemo());
 
         //URL url = new URL(baseurl + data.get(position).getAimage());
         String url = baseurl + data.get(position).getAimage();

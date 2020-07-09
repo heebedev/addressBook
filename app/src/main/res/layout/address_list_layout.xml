@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -104,14 +104,25 @@
                 />
 
 
-        </LinearLayout>
 
+
+        </LinearLayout>
 
     </LinearLayout>
 
-
-
-
+    <TextView
+        android:id="@+id/tv_addresslist_cmt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="top|center"
+        android:textColor="#888484"
+        android:textSize="12dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:text="세부내용"
+        android:visibility="gone"
+        />
 
 
 </LinearLayout>

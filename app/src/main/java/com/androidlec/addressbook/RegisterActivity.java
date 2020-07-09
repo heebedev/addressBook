@@ -172,6 +172,8 @@ public class RegisterActivity extends AppCompatActivity {
         et_regId.setText("");
         et_regPw.setText("");
         et_regPwOk.setText("");
+
+        finish();
     }
 
 
