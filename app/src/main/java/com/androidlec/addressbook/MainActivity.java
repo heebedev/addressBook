@@ -3,7 +3,6 @@ package com.androidlec.addressbook;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -13,22 +12,22 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
 import com.androidlec.addressbook.dto_sh.Address;
 import com.androidlec.addressbook.network_sh.NetworkTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
-
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    String TAG = "Log Chk : ";
+    LJH_data ljh_data; // 아이디값 불러오는 클래스.
 
     private ActionBar actionBar;
 
@@ -59,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         actionBar = getSupportActionBar();
 
+        //Log.v("MainActivity.java", LJH_data.getLoginId());
 
         spinner_tags = findViewById(R.id.main_sp_taglist);
         spinnerNames = res.getStringArray(R.array.maintaglist);
@@ -70,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
         fladdBtn = findViewById(R.id.main_fab_add);
 
         centIP = "192.168.0.138";
+
+        // 태그 불러오기.
+        onTagList();
+
     }
 
 
@@ -183,6 +187,46 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }  // connectGetData
+
+
+    private void onTagList() {
+        Log.v(TAG, "onTagList()()");
+
+        urlAddr = "http://192.168.0.178:8080/Test/tagList.jsp?";
+        urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
+
+        connectTagListData();
     }
 
-}
+
+    // 태그 리스트 불러오기.
+    private void connectTagListData() {
+        Log.v(TAG, "connectTagListData()");
+
+        try {
+            LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
+            Object obj = tagListNetworkTask.execute().get();
+            ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
+
+            tNames.add(0, "전체보기");
+
+            spinnerNames[1] = tNames.get(0);
+            spinnerNames[2] = tNames.get(1);
+            spinnerNames[3] = tNames.get(2);
+            spinnerNames[4] = tNames.get(3);
+            spinnerNames[5] = tNames.get(4);
+            spinnerNames[6] = tNames.get(5);
+            spinnerNames[7] = tNames.get(6);
+
+            Log.v(TAG, "tag 대체 완료.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }  // connectTagListData
+
+
+}//----
+

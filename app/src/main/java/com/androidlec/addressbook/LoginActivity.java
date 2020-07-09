@@ -6,7 +6,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -54,9 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
             switch (v.getId()) {
                 case R.id.login_btn_login:
-                    Toast.makeText(LoginActivity.this, "로그인액션", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    loginChk();
+                    idPwChk();
                     break;
                 case R.id.login_tv_register:
                     startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
@@ -64,6 +64,26 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void idPwChk() {
+        String idChk = et_id.getText().toString();
+        String pwChk = et_password.getText().toString();
+
+        // 로그인 이메일 포맷체크
+        if (!Patterns.EMAIL_ADDRESS.matcher(idChk).matches()) {
+            // invalid email pattern set error
+            Toast.makeText(LoginActivity.this, "이메일 주소를 확인해주세요.", Toast.LENGTH_SHORT).show();
+            et_id.setError("이메일 주소를 확인해주세요.");
+            et_id.setFocusable(true);
+        } else if (pwChk.length() < 6) {
+            Toast.makeText(LoginActivity.this, "6자리 이상의 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            et_password.setError("6자리 이상의 비밀번호를 입력해주세요.");
+            et_password.setFocusable(true);
+        } else {
+            loginChk();
+        }
+    }
+
 
     private void loginChk(){
         Log.v(TAG, "loginChk()");
@@ -85,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
             LJH_LoginNetworkTask loginNetworkTask = new LJH_LoginNetworkTask(LoginActivity.this, urlAddr);
             int loginChk = loginNetworkTask.execute().get();
             if(loginChk == 0){
-                Toast.makeText(LoginActivity.this, "회원정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "회원님의 이메일 주소 혹은 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show();
             }else {
                 // 로그인 완료.
                 loginOk();
@@ -97,9 +117,16 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginOk(){
         Log.v(TAG, "loginOk()");
-//        Intent intent = new Intent(LoginActivity.this, MAINActivity.class);
-//        intent.putExtra("uId", et_id);
-//        startActivity(intent);
+        Toast.makeText(LoginActivity.this, "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
+
+        // 로그인값넘기기.
+        LJH_data ljh_data = new LJH_data();
+        ljh_data.setLoginId(et_id.getText().toString());
+
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+
+        finish();
     }
 
 
