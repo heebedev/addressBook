@@ -38,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="비밀번호"
-            android:inputType="textPassword"/>
+            android:inputType="textPassword"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
