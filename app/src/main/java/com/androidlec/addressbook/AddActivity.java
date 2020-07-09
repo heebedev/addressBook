@@ -29,11 +29,13 @@ import android.widget.Toast;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class AddActivity extends AppCompatActivity {
 
     private TextView tvbtregister, tvbtcancle;
     private ImageView ivAddImage;
+    private TextInputEditText et_name, et_phone, et_email, et_comment;
 
     private Spinner spinner_tags;
     String[] spinnerNames;
@@ -51,6 +53,11 @@ public class AddActivity extends AppCompatActivity {
         tvbtregister = findViewById(R.id.tvbt_addAddress_register);
         tvbtcancle = findViewById(R.id.tvbt_addAddress_cancel);
         ivAddImage = findViewById(R.id.iv_addAddress_image);
+
+        et_name = findViewById(R.id.et_addAddress_name);
+        et_phone = findViewById(R.id.et_addAddress_phone);
+        et_email = findViewById(R.id.et_addAddress_email);
+        et_comment = findViewById(R.id.et_addAddress_cmt);
 
         spinner_tags = findViewById(R.id.add_sp_taglist);
         spinnerNames = new String[]{"태그없음", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "회색"};
@@ -91,6 +98,7 @@ public class AddActivity extends AppCompatActivity {
             for (int i = 0; i < length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     // 동의
+                    showImagePicDialog();
                 }
             }
         }
@@ -137,6 +145,7 @@ public class AddActivity extends AppCompatActivity {
                     showImagePicDialog();
                     break;
                 case R.id.tvbt_addAddress_register :
+                    inputNewData();
                     break;
                 case R.id.tvbt_addAddress_cancel :
                     finish();
@@ -145,11 +154,26 @@ public class AddActivity extends AppCompatActivity {
         }
     };
 
+    private void inputNewData() {
+        String name = et_name.getText().toString().trim();
+        String phone = et_phone.getText().toString().trim();
+        String email = et_email.getText().toString().trim();
+        String comment = et_comment.getText().toString().trim();
+
+        if(TextUtils.isEmpty(name)){
+            Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+        } else if(TextUtils.isEmpty(phone)){
+            Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "okok", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showImagePicDialog() {
-        String[] options = {"Camera", "Gallery"};
+        String[] options = {"카메라에서 촬영", "갤러리에서 선택"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(AddActivity.this);
-        builder.setTitle("Pick Image From");
+        builder.setTitle("이미지 등록");
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
