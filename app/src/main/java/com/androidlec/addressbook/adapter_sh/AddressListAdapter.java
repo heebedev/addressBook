@@ -16,8 +16,9 @@ import android.widget.TextView;
 import com.androidlec.addressbook.MainActivity;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.dto_sh.Address;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -54,13 +55,13 @@ public class AddressListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
 
         if(convertView == null) {
             convertView = inflater.inflate(this.layout, parent, false);
         }
 
-        final ImageView ivpfimage = convertView.findViewById(R.id.iv_addresslist_pfimage);
+        ImageView ivpfimage = convertView.findViewById(R.id.iv_addresslist_pfimage);
         TextView tvname = convertView.findViewById(R.id.tv_addresslist_name);
         TextView tvphone = convertView.findViewById(R.id.tv_addresslist_email);
         TextView tvemail = convertView.findViewById(R.id.tv_addresslist_phone);
@@ -73,25 +74,15 @@ public class AddressListAdapter extends BaseAdapter {
         tvphone.setText(data.get(position).getAphone());
         tvemail.setText(data.get(position).getAemail());
 
+        //URL url = new URL(baseurl + data.get(position).getAimage());
+        String url = baseurl + data.get(position).getAimage();
+
         //이미지 보여주기
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                try{
-                    URL url = new URL(baseurl + data.get(position).getAimage());
-                    InputStream is = url.openStream();
-                    final Bitmap bm = BitmapFactory.decodeStream(is);
-                    ivpfimage.setImageBitmap(bm);
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-
-            }
-        });
-
-        t.start();
-
+        Glide.with(mContext)
+                .load(url)
+                .apply(new RequestOptions().circleCrop())
+                .placeholder(R.drawable.ic_outline_emptyimage)
+                .into(ivpfimage);
 
         //Tag color 보여주기
         Resources res = null;

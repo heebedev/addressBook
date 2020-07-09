@@ -10,15 +10,14 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/tp_rounded_outline"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal" >
 
         <ImageView
             android:id="@+id/iv_addresslist_pfimage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center_vertical"
             android:layout_margin="10dp"
             />
@@ -42,10 +41,10 @@
                     android:layout_width="170dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
-                    android:gravity="bottom"
+                    android:gravity="center_vertical"
                     android:text="홍길동"
                     android:textColor="#494848"
-                    android:textSize="16dp"
+                    android:textSize="15dp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -63,6 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="2dp"
                     />
 
                 <ImageView
@@ -71,6 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="2dp"
                     />
 
             </LinearLayout>
@@ -83,7 +84,8 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="bottom"
                 android:textColor="#888484"
-                android:layout_marginLeft="10dp"
+                android:textSize="12dp"
+                android:layout_marginLeft="15dp"
                 android:text="010-7777-7777"
                 />
 
@@ -96,7 +98,8 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="top"
                 android:textColor="#888484"
-                android:layout_marginLeft="10dp"
+                android:textSize="12dp"
+                android:layout_marginLeft="15dp"
                 android:text="zzeung@gmail.com"
                 />
 
