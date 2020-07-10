@@ -36,9 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spinner_tags;
     public static String[] spinnerNames;
 
-    int selected_tag_idx = 0;
-
-
     //리스트뷰
     private ArrayList<Address> data = null;
     private AddressListAdapter adapter = null;
@@ -177,13 +174,13 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, spinnerNames[position], Toast.LENGTH_SHORT).show();
 
                 if (position == 0) {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
                     //Log.v("status", urlAddr);
                 } else {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + selected_tag_idx;
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + position;
                     //Log.v("status", urlAddr);
                 }
                 connectGetData();
