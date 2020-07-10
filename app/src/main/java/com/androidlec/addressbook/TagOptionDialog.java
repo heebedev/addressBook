@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 public class TagOptionDialog extends AppCompatActivity {
 
-    String TAG = "Log Chk : ";
     String urlAddr;
     String tag1, tag2, tag3, tag4, tag5, tag6, tag7;
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
@@ -65,20 +64,14 @@ public class TagOptionDialog extends AppCompatActivity {
     };
 
     private void onTagList() {
-        Log.v(TAG, "onTagList()()");
-
         urlAddr = "http://192.168.0.178:8080/Test/tagList.jsp?";
         urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
-
-        Log.v(TAG, urlAddr);
 
         // 태그 리스트 불러오기.
         connectTagListData();
     }
 
     private void onChangeTagName(){
-        Log.v(TAG, "onChangeTagName()()");
-
         tag1 = et_red.getText().toString();
         tag2 = et_orange.getText().toString();
         tag3 = et_yellow.getText().toString();
@@ -89,8 +82,6 @@ public class TagOptionDialog extends AppCompatActivity {
 
         urlAddr = "http://192.168.0.178:8080/Test/tagChange.jsp?";
         urlAddr = urlAddr + "id=" + ljh_data.getLoginId() + "&tag1=" + tag1 + "&tag2=" + tag2 + "&tag3=" + tag3 + "&tag4=" + tag4 + "&tag5=" + tag5 + "&tag6=" + tag6 + "&tag7=" + tag7;
-
-        Log.v(TAG, urlAddr);
 
         // 태그명 바꾸기.
         connectTagChangeData();
@@ -110,8 +101,6 @@ public class TagOptionDialog extends AppCompatActivity {
 
     // 태그명 불러오기.
     private void connectTagListData() {
-        Log.v(TAG, "connectTagListData()");
-
         try {
             LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(TagOptionDialog.this, urlAddr);
             Object obj = tagListNetworkTask.execute().get();
@@ -124,7 +113,6 @@ public class TagOptionDialog extends AppCompatActivity {
             et_blue.setText(tNames.get(4));
             et_purple.setText(tNames.get(5));
             et_gray.setText(tNames.get(6));
-            Log.v(TAG, "tName 입력완료.");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,8 +122,6 @@ public class TagOptionDialog extends AppCompatActivity {
 
     // 태그명 바꾸기.
     private void connectTagChangeData() {
-        Log.v(TAG, "connectTagChangeData()");
-
         try{
             LJH_InsertNetworkTask tagChangeNetworkTask = new LJH_InsertNetworkTask(TagOptionDialog.this, urlAddr);
             tagChangeNetworkTask.execute().get();

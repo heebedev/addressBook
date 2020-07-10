@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    String TAG = "Log Chk : ";
     String urlAddr;
     String urlAddrTag;
     EditText et_regId, et_regPw, et_regPwOk;
@@ -46,12 +45,11 @@ public class RegisterActivity extends AppCompatActivity {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Log.v(TAG, "onClick()");
-
             switch (view.getId()){
                 case R.id.register_tv_login:
                     Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     startActivity(intent);
+                    finish();
                     break;
                 case R.id.register_btn_register:
                     blankChk();
@@ -96,13 +94,10 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     private void pwChk(){
-        Log.v(TAG, "pwChk()");
-
         regPw = et_regPw.getText().toString();
         regPwOk = et_regPwOk.getText().toString();
 
         if(regPw.equals(regPwOk)){
-            Log.v(TAG, "패스워드 일치.");
 
             idDoubleChk(); // 아이디 중복 체크.
             // connectRegData(); // 회원가입 DB 연결.
@@ -119,22 +114,16 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     private void idDoubleChk(){
-        Log.v(TAG, "idDoubleChk()");
-
         regId = et_regId.getText().toString();
 
         urlAddr = "http://192.168.0.178:8080/Test/idDoubleChk.jsp?";
         urlAddr = urlAddr + "id=" + regId;
-        Log.v(TAG, urlAddr);
 
         connectIdDoubleChkData();
-        Log.v(TAG, "connectIdDoubleChkData()");
     }
 
 
     private void connectIdDoubleChkData(){
-        Log.v(TAG, "connectLoginData()");
-
         try{
             LJH_LoginNetworkTask idDoubleChkNetworkTask = new LJH_LoginNetworkTask(RegisterActivity.this, urlAddr);
             int idDoubleChk = idDoubleChkNetworkTask.execute().get();
@@ -152,8 +141,6 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     private void register(){
-        Log.v(TAG, "register()");
-
         regId = et_regId.getText().toString();
         regPw = et_regPw.getText().toString();
 
@@ -162,7 +149,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         urlAddrTag = "";
         urlAddrTag = "http://192.168.0.178:8080/Test/tagInsert.jsp?id=" + regId;
-        Log.v(TAG, urlAddr);
 
         connectRegisterData();
         connectTagInsertData();
@@ -178,7 +164,6 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     private void connectRegisterData(){ // NetworkTask Async 방식. == permission 줘야 하는구나!
-        Log.v(TAG, "connectRegisterData()");
         try {
             LJH_InsertNetworkTask insertNetworkTask = new LJH_InsertNetworkTask(RegisterActivity.this, urlAddr);
             insertNetworkTask.execute().get();
@@ -189,7 +174,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void connectTagInsertData(){
-        Log.v(TAG, "connectTagInsertData()");
         try {
             LJH_InsertNetworkTask tagInsertNetworkTask = new LJH_InsertNetworkTask(RegisterActivity.this, urlAddrTag);
             tagInsertNetworkTask.execute().get();
