@@ -23,6 +23,7 @@
             android:theme="@style/MainTheme" />
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".LoginActivity" />
+        <activity android:name=".LJH_SettingActivity" />
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

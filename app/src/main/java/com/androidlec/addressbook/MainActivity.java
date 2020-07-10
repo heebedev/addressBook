@@ -33,6 +33,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
+    ArrayList<String> tNames;
 
     private ActionBar actionBar;
 
@@ -78,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // 초기화
         init();
 
@@ -146,6 +146,9 @@ public class MainActivity extends AppCompatActivity {
 //                break;
             case R.id.menu_optionTag:
                 startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
+                break;
+            case R.id.menu_setting:
+                startActivity(new Intent(MainActivity.this, LJH_SettingActivity.class));
                 break;
             case R.id.menu_logout:
                 ljh_data.setLoginId("");
@@ -239,7 +242,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
             Object obj = tagListNetworkTask.execute().get();
-            ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
+            tNames = new ArrayList<String>();
+            tNames.clear();
+            tNames = (ArrayList<String>) obj; // cast.
 
             spinnerNames[1] = tNames.get(0);
             spinnerNames[2] = tNames.get(1);
