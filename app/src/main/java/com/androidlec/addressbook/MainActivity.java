@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags = findViewById(R.id.main_sp_taglist);
         fladdBtn = findViewById(R.id.main_fab_add);
 
+        spinnerNames[0] = "전체보기";
+
         // 태그 불러오기.
         onTagList();
 

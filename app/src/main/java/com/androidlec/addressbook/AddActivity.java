@@ -40,7 +40,7 @@ public class AddActivity extends AppCompatActivity {
     private TextInputEditText et_name, et_phone, et_email, et_comment;
 
     private Spinner spinner_tags;
-    String[] spinnerNames;
+    String[] spinnerReNames;
     TypedArray spinnerImages;
     int selected_tag_idx = 0;
 
@@ -65,10 +65,10 @@ public class AddActivity extends AppCompatActivity {
         ivAddImage = findViewById(R.id.iv_addAddress_image);
 
 
-        spinnerNames = MainActivity.spinnerNames;
+        spinnerReNames = MainActivity.spinnerNames;
         spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
-        spinnerNames[0] = "태그 없음";
+        spinnerReNames[0] = "태그 없음";
 
         et_name = findViewById(R.id.et_addAddress_name);
         et_phone = findViewById(R.id.et_addAddress_phone);
