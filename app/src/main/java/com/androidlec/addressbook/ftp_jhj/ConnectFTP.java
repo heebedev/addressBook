@@ -1,4 +1,4 @@
-package com.androidlec.addressbook.FTP_JHJ;
+package com.androidlec.addressbook.ftp_jhj;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
