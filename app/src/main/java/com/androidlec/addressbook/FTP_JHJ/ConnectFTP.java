@@ -13,7 +13,6 @@ import java.util.Date;
 
 public class ConnectFTP extends AsyncTask<Integer, String, String> {
 
-    private final String TAG = "Connect FTP";
     public FTPClient mFTPClient = null;
 
     Context context;
@@ -48,7 +47,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
             // 현재시간을 date 변수에 저장한다.
             Date date = new Date(now);
             // 시간을 나타냇 포맷을 정한다 ( yyyy/MM/dd 같은 형태로 변형 가능 )
-            SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
+            SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
             // nowDate 변수에 값을 저장한다.
             formatDate = sdfNow.format(date);
 
