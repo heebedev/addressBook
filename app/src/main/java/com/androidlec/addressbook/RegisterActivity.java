@@ -47,8 +47,6 @@ public class RegisterActivity extends AppCompatActivity {
         public void onClick(View view) {
             switch (view.getId()){
                 case R.id.register_tv_login:
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(intent);
                     finish();
                     break;
                 case R.id.register_btn_register:

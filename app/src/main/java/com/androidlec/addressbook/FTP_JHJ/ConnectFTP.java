@@ -1,4 +1,5 @@
 package com.androidlec.addressbook.FTP_JHJ;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,6 +23,8 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
     int port;
     Uri file;
 
+    ProgressDialog progressDialog;
+
     public ConnectFTP(Context context, String host, String username, String password, int port, Uri file) {
         this.context = context;
         this.host = host;
@@ -33,11 +36,25 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
     }
 
     @Override
+    protected void onPreExecute() {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+    }
+
+    @Override
+    protected void onPostExecute(String aVoid) {
+        super.onPostExecute(aVoid);
+        progressDialog.dismiss();
+    }
+
+    @Override
     protected String doInBackground(Integer... integers) {
         String formatDate = "";
 
         // FTP 접속 체크
-        boolean status = false;
+        boolean status;
         // FTP 접속 시
         if (status = ftpConnect(host, username, password, port)) {
             String currentPath = ftpGetDirectory() + "imgs";
@@ -53,7 +70,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
 
             // 파일 업로드시
             if (ftpUploadFile(file, formatDate+".jpg", currentPath)) {
-                Log.v("ConnectFTP", "Success");
+                Log.v("Chance", "Success");
             }
         }
 

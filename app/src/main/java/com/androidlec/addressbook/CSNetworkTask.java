@@ -3,6 +3,7 @@ package com.androidlec.addressbook;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,10 +21,10 @@ public class CSNetworkTask extends AsyncTask<Integer, String, Void> {
 
     @Override
     protected void onPreExecute() {
+        Log.e("Chance", "onPreExecute");
         progressDialog = new ProgressDialog(context);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setTitle("Dialog");
-        progressDialog.setMessage("Insert...");
+        progressDialog.setMessage("Please Wait...");
         progressDialog.show();
     }
 
@@ -51,7 +52,6 @@ public class CSNetworkTask extends AsyncTask<Integer, String, Void> {
             httpURLConnection.setConnectTimeout(10000);
 
             if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-
             }
 
         } catch (Exception e) {

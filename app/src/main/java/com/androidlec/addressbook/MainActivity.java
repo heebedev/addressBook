@@ -156,8 +156,6 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(MainActivity.this, spinnerNames[position], Toast.LENGTH_SHORT).show();
-
 
                 if (position == 0) {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
