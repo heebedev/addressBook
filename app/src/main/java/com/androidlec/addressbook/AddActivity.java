@@ -56,8 +56,10 @@ public class AddActivity extends AppCompatActivity {
         ivAddImage = findViewById(R.id.iv_addAddress_image);
 
         spinner_tags = findViewById(R.id.add_sp_taglist);
-        spinnerNames = res.getStringArray(R.array.addaddresstaglist);
+        spinnerNames = MainActivity.spinnerNames;
         spinnerImages = res.obtainTypedArray(R.array.tag_array);
+
+        spinnerNames[0] = "태그 없음";
 
     }
 
@@ -104,6 +106,8 @@ public class AddActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
+
+
 
 
         // 키보드 화면 가림막기

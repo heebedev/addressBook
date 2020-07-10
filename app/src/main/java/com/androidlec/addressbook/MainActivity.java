@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     //스피너
     private Spinner spinner_tags;
-    String[] spinnerNames;
+    public static String[] spinnerNames;
     int selected_tag_idx = 0;
 
 
