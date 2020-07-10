@@ -38,6 +38,7 @@ public class AddActivity extends AppCompatActivity {
     private TextInputEditText et_name, et_phone, et_email, et_comment;
 
     String[] spinnerReNames;
+    String[] spinnerNames;
     TypedArray spinnerImages;
 
     // 카메라 관련

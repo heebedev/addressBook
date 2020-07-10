@@ -1,14 +1,18 @@
 package com.androidlec.addressbook.adapter_sh;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -128,5 +132,4 @@ public class AddressListAdapter extends BaseAdapter {
 
         return convertView;
     }
-
 }
