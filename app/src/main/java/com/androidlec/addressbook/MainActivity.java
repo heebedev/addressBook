@@ -1,5 +1,6 @@
 package com.androidlec.addressbook;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
@@ -51,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
     public static TypedArray tagImages;
 
     TextView pre_cmt;
+
+    // 길게 눌러서 클릭할때 같은 아이템 칸에서 클릭하면 둘다 이벤트가 발동되는것을 막기위함.
+    int click = 0;
+
+
 
 
     private void init() {
@@ -93,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setTitle("내 주소록");
         actionBar.setElevation(0);
 
+        // listview 클릭 이벤트
         listView.setOnItemClickListener(lvOnItemClickListener);
+        listView.setOnItemLongClickListener(lvOnItemLongClickListener);
 
 
     }
@@ -234,18 +244,66 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);
+            if (click == 0 ) {
+                TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);
 
-            if (pre_cmt == null) {
-                pre_cmt = cmt;
-            } else {
-                pre_cmt.setVisibility(View.GONE);
-                pre_cmt = cmt;
+                if (pre_cmt == null) {
+                    pre_cmt = cmt;
+                } else {
+                    pre_cmt.setVisibility(View.GONE);
+                    pre_cmt = cmt;
+                }
+
+                cmt.setVisibility(View.VISIBLE);
             }
-
-            cmt.setVisibility(View.VISIBLE);
-
         }
     };
+
+    ListView.OnItemLongClickListener lvOnItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            click = 1;
+
+            //                                              inflate XML 를 부르는 메소드
+            final LinearLayout linear = (LinearLayout) View.inflate(MainActivity.this, R.layout.activity_add , null);
+
+            // -------------------------------------------------------------------------
+            // CustomDialogLayou 안에있는 텍스트뷰 값 넣어주기. -------------------------------
+            TextView dialogName = linear.findViewById(R.id.et_addAddress_name);
+            TextView dialogPhone = linear.findViewById(R.id.et_addAddress_phone);
+            TextView dialogEmail = linear.findViewById(R.id.et_addAddress_email);
+            TextView dialogCmt = linear.findViewById(R.id.et_addAddress_cmt);
+
+            // -------------------------------------------------------------------------
+            // -------------------------------------------------------------------------
+
+            // -------------------------------------------------------------------------
+            // ---------- Dialog 만들기 --------------------------------------------------
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("데이터를 삭제하시겠습니까?")
+                    .setIcon(R.mipmap.ic_launcher)
+                    .setView(linear)
+                    .setCancelable(false)   // 배경 눌러도 안닫힘
+                    .setNegativeButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            click = 0;
+                        }
+                    })
+                    .setPositiveButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            click = 0;
+                        }
+                    })
+                    .show();
+            // -------------------------------------------------------------------------
+            // ---------- Dialog 만들기 끝 ------------------------------------------------
+
+            return true;
+        }
+    };
+
 }//----
 

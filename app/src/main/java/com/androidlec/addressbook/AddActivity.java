@@ -39,10 +39,8 @@ public class AddActivity extends AppCompatActivity {
     private ImageView ivAddImage;
     private TextInputEditText et_name, et_phone, et_email, et_comment;
 
-    private Spinner spinner_tags;
     String[] spinnerNames;
     TypedArray spinnerImages;
-    int selected_tag_idx = 0;
 
     // 카메라 관련
     private static final int PERMISSION_REQUST_CODE = 100;

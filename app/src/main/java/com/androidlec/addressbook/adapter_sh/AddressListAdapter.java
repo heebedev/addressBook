@@ -130,18 +130,6 @@ public class AddressListAdapter extends BaseAdapter {
                 break;
         }
 
-        Button btn = convertView.findViewById(R.id.tv_addresslist_btn_delete);
-        btn.setTag(position);
-        btn.setOnClickListener(list_adapter_onClickListener);
-
         return convertView;
     }
-
-    Button.OnClickListener list_adapter_onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.v("AddressListAdapter", v.getTag().toString());
-        }
-    };
-
 }
