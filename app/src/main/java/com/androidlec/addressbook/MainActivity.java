@@ -1,27 +1,29 @@
 package com.androidlec.addressbook;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
 import com.androidlec.addressbook.dto_sh.Address;
 import com.androidlec.addressbook.network_sh.NetworkTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.SearchView;
+
 import java.util.ArrayList;
 
 
@@ -35,9 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spinner_tags;
     public static String[] spinnerNames;
 
-    int selected_tag_idx = 0;
-
-
     //리스트뷰
     private ArrayList<Address> data = null;
     private AddressListAdapter adapter = null;
@@ -45,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
     //datajsp
     String centIP, urlAddr;
-
 
     //플로팅버튼
     FloatingActionButton fladdBtn;
@@ -84,26 +82,6 @@ public class MainActivity extends AppCompatActivity {
 
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
         spinner_tags.setAdapter(customSpinnerAdapter);
-
-        spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selected_tag_idx = spinner_tags.getSelectedItemPosition();
-
-                if (selected_tag_idx == 0) {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
-                } else {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + selected_tag_idx;
-                }
-                connectGetData();
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         //리스트뷰
         data = new ArrayList<>();
@@ -171,8 +149,12 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selected_tag_idx = spinner_tags.getSelectedItemPosition();
-                Toast.makeText(MainActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
+                if (position == 0) {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
+                } else {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid=" + ljh_data.loginId + "&aTag=" + position;
+                }
+                connectGetData();
             }
 
             @Override
@@ -185,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid="+ ljh_data.loginId +"&search=" + query;
+            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid=" + ljh_data.loginId + "&search=" + query;
             connectGetData();
             return false;
         }
@@ -253,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);;
+            TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);
 
             if (pre_cmt == null) {
                 pre_cmt = cmt;
