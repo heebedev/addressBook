@@ -17,11 +17,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +37,8 @@ public class AddActivity extends AppCompatActivity {
     private ImageView ivAddImage;
     private TextInputEditText et_name, et_phone, et_email, et_comment;
 
-    private Spinner spinner_tags;
-    String[] spinnerNames;
+    String[] spinnerReNames;
     TypedArray spinnerImages;
-    int selected_tag_idx = 0;
 
     // 카메라 관련
     private static final int PERMISSION_REQUST_CODE = 100;
@@ -50,10 +46,15 @@ public class AddActivity extends AppCompatActivity {
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
 
     private Uri image_uri;
+    
+    private int mWhich;
 
     // Register
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
     private  ArrayList<String> tagList;
+
+    //3개 이상 클릭 방지
+    int tagclick = 0;
 
     private void init() {
         Resources res = getResources();
@@ -63,10 +64,10 @@ public class AddActivity extends AppCompatActivity {
         ivAddImage = findViewById(R.id.iv_addAddress_image);
 
 
-        spinnerNames = MainActivity.spinnerNames;
+        spinnerReNames = MainActivity.spinnerNames;
         spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
-        spinnerNames[0] = "태그 없음";
+        spinnerReNames[0] = "태그 없음";
 
         et_name = findViewById(R.id.et_addAddress_name);
         et_phone = findViewById(R.id.et_addAddress_phone);
@@ -74,18 +75,29 @@ public class AddActivity extends AppCompatActivity {
         et_comment = findViewById(R.id.et_addAddress_cmt);
 
 
-        for (int iv_tag : iv_tags) {
-            findViewById(iv_tag).setOnClickListener(new View.OnClickListener() {
+        for (int i = 0; i < iv_tags.length; i++) {
+            final int finalI = i;
+            findViewById(iv_tags[i]).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(v.isSelected()){
                         v.setSelected(false);
+                        tagclick--;
                     } else {
-                        v.setSelected(true);
+                        if (tagclick < 3) {
+                            int pos = finalI + 1;
+                            v.setSelected(true);
+                            Toast.makeText(AddActivity.this, spinnerReNames[pos], Toast.LENGTH_SHORT).show();
+                            tagclick++;
+                        } else {
+                            Toast.makeText(AddActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
+
                 }
             });
         }
+
     }
 
     public boolean checkPermission() {
@@ -121,7 +133,13 @@ public class AddActivity extends AppCompatActivity {
             for (int i = 0; i < length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     // 동의
-                    showImagePicDialog();
+                    if(mWhich == 0){
+                        pickFromCamera();
+                    } else {
+                        pickFromGallery();
+                    }
+                } else {
+                    Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -132,9 +150,6 @@ public class AddActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
-
-
-
 
         // 키보드 화면 가림막기
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -169,17 +184,20 @@ public class AddActivity extends AppCompatActivity {
         String phone = et_phone.getText().toString().trim();
         String email = et_email.getText().toString().trim();
         String comment = et_comment.getText().toString().trim();
+        String userId = LJH_data.getLoginId();
+        int userSeq = LJH_data.getLoginSeqno();
         if(tagSelectedOK()){
-            Log.e("Chance", tagList.toString().substring(0, -1));
+            String tagListString = tagList.toString();
+            tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
+            tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
 
             if(TextUtils.isEmpty(name)){
                 Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(TextUtils.isEmpty(phone)){
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(image_uri == null){
-                //uploadToDB(name, phone, email, comment, "");
+                uploadToDB(name, phone, email, comment, "", tagListString, userId, userSeq);
             } else {
-                //                                       context                    ip                  hostname          hostpw                port    uri(file)
                 ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                 String fileName = "";
                 try {
@@ -189,10 +207,8 @@ public class AddActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //uploadToDB(name, phone, email, comment, fileName);
+                uploadToDB(name, phone, email, comment, fileName, tagListString, userId, userSeq);
             }
-        } else {
-
         }
 
     }
@@ -218,10 +234,10 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
-    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags) {
+    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags, String userId, int userSeq) {
         String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags;
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&userId=" + userId + "&userSeq=" + userSeq;
 
         try {
             CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);
@@ -243,14 +259,12 @@ public class AddActivity extends AppCompatActivity {
                 if(checkPermission()){
                     if(which == 0){
                         pickFromCamera();
+                        mWhich = 0;
                     } else {
                         pickFromGallery();
+                        mWhich = 1;
                     }
                 }
-//                else {
-//                    Toast.makeText(AddActivity.this, "권한 요청을 동의해주세요.", Toast.LENGTH_SHORT).show();
-//                }
-
             }
         });
         builder.create().show();
@@ -258,7 +272,6 @@ public class AddActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                 assert data != null;
