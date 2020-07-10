@@ -1,5 +1,7 @@
 package com.androidlec.addressbook;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -8,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
@@ -120,6 +123,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+//            case R.id.menu_instruction:
+//                new AlertDialog.Builder(MainActivity.this)
+//                        .setTitle("사용방법")
+//                        .setMessage("")
+//                        .setCancelable(false)
+//                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                EditText et_1 = linearLayout.findViewById(R.id.et_1);
+//                                EditText et_2 = linearLayout.findViewById(R.id.et_2);
+//
+//                                int num1 = Integer.parseInt(et_1.getText().toString());
+//                                int num2 = Integer.parseInt(et_2.getText().toString());
+//                                int result = num1 + num2;
+//
+//                                textView.setText(num1 + " + " + num2 + " = " +result);
+//                            }
+//                        })
+//                        .setNegativeButton("취소", null)
+//                        .show();
+//                break;
             case R.id.menu_optionTag:
                 startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
                 break;
