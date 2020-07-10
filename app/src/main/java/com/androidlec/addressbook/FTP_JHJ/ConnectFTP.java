@@ -58,7 +58,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
             }
         }
 
-        if (status == true) {
+        if (status) {
             ftpDisconnect();
         }
 

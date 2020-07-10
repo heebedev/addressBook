@@ -175,6 +175,7 @@ public class AddActivity extends AppCompatActivity {
         String email = et_email.getText().toString().trim();
         String comment = et_comment.getText().toString().trim();
         String userId = LJH_data.getLoginId();
+        int userSeq = LJH_data.getLoginSeqno();
         if(tagSelectedOK()){
             String tagListString = tagList.toString();
             tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
@@ -185,7 +186,7 @@ public class AddActivity extends AppCompatActivity {
             } else if(TextUtils.isEmpty(phone)){
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(image_uri == null){
-                uploadToDB(name, phone, email, comment, "", tagListString, userId);
+                uploadToDB(name, phone, email, comment, "", tagListString, userId, userSeq);
             } else {
                 ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                 String fileName = "";
@@ -196,7 +197,7 @@ public class AddActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                uploadToDB(name, phone, email, comment, fileName, tagListString, userId);
+                uploadToDB(name, phone, email, comment, fileName, tagListString, userId, userSeq);
             }
         }
 
@@ -223,10 +224,10 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
-    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags, String userId) {
+    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags, String userId, int userSeq) {
         String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&userId=" + userId;
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&userId=" + userId + "&userSeq=" + userSeq;
 
         try {
             CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);

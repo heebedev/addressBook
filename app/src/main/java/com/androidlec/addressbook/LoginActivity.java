@@ -22,7 +22,6 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText et_id, et_password;
     private Button btn_login;
     private TextView tv_register;
-    String TAG = "Log Chk : ";
     String urlAddr;
     String uId, uPw;
 
@@ -52,8 +51,6 @@ public class LoginActivity extends AppCompatActivity {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.v(TAG, "onClick()");
-
             switch (v.getId()) {
                 case R.id.login_btn_login:
                     idPwChk();
@@ -86,21 +83,16 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void loginChk(){
-        Log.v(TAG, "loginChk()");
-
         uId = et_id.getText().toString();
         uPw = et_password.getText().toString();
 
         urlAddr = "http://192.168.0.178:8080/Test/loginChk.jsp?";
         urlAddr = urlAddr + "id=" + uId + "&pw=" + uPw;
-        Log.v(TAG, urlAddr);
 
         connectLoginData();
     }
 
     private void connectLoginData(){
-        Log.v(TAG, "connectLoginData()");
-
         try{
             LJH_LoginNetworkTask loginNetworkTask = new LJH_LoginNetworkTask(LoginActivity.this, urlAddr);
             int loginChk = loginNetworkTask.execute().get();
@@ -116,18 +108,46 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginOk(){
-        Log.v(TAG, "loginOk()");
         Toast.makeText(LoginActivity.this, "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
 
-        // 로그인값넘기기.
+
+        // 로그인 아이디 넘기기.
         LJH_data ljh_data = new LJH_data();
         ljh_data.setLoginId(et_id.getText().toString());
+
+        // 로그인 스퀸스넘버 넘기기.
+        getUSeqno();
 
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
 
         finish();
     }
+
+
+    private void getUSeqno(){
+        uId = et_id.getText().toString();
+
+        urlAddr = "http://192.168.0.178:8080/Test/uSeqno.jsp?";
+        urlAddr = urlAddr + "id=" + uId;
+
+        connectUSeqnoData();
+    }
+
+
+    private void connectUSeqnoData(){
+        try{
+            LJH_LoginNetworkTask loginNetworkTask = new LJH_LoginNetworkTask(LoginActivity.this, urlAddr);
+            int uSeqno = loginNetworkTask.execute().get();
+
+            LJH_data ljh_data = new LJH_data();
+            ljh_data.setLoginSeqno(uSeqno);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
 
 }//----

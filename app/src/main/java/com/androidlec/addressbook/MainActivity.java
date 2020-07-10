@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    String TAG = "Log Chk : ";
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
 
     private ActionBar actionBar;
@@ -187,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onQueryTextSubmit(String query) {
             urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid="+ ljh_data.loginId +"&search=" + query;
-            //Log.v("status", urlAddr);
             connectGetData();
             return false;
         }
@@ -224,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void onTagList() {
-        Log.v(TAG, "onTagList()()");
-
         urlAddr = "http://192.168.0.178:8080/Test/tagList.jsp?";
         urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
 
@@ -235,8 +231,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 태그 리스트 불러오기.
     private void connectTagListData() {
-        Log.v(TAG, "connectTagListData()");
-
         try {
             LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
             Object obj = tagListNetworkTask.execute().get();
@@ -249,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
             spinnerNames[5] = tNames.get(4);
             spinnerNames[6] = tNames.get(5);
             spinnerNames[7] = tNames.get(6);
-
-            Log.v(TAG, "tag 대체 완료.");
 
         } catch (Exception e) {
             e.printStackTrace();
