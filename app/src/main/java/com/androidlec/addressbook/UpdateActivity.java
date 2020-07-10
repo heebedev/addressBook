@@ -89,6 +89,7 @@ public class UpdateActivity extends AppCompatActivity {
                         if (tagClick < 3) {
                             int pos = finalI + 1;
                             v.setSelected(true);
+                            Toast.makeText(UpdateActivity.this, spinnerReNames[pos], Toast.LENGTH_SHORT).show();
                             tagClick++;
                         } else {
                             Toast.makeText(UpdateActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();

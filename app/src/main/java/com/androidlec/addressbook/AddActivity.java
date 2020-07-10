@@ -86,6 +86,7 @@ public class AddActivity extends AppCompatActivity {
                         if (tagClick < 3) {
                             int pos = finalI + 1;
                             v.setSelected(true);
+                            Toast.makeText(AddActivity.this, spinnerReNames[pos], Toast.LENGTH_SHORT).show();
                             tagClick++;
                         } else {
                             Toast.makeText(AddActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();
@@ -217,6 +218,7 @@ public class AddActivity extends AppCompatActivity {
 
         for (int i = 0; i < iv_tags.length; i++) {
             if (findViewById(iv_tags[i]).isSelected()){
+                int pos = i + 1;
                 tagList.add(String.valueOf(i+1));
             }
         }
