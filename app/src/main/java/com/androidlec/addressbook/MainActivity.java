@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //리스트뷰
-        data = new ArrayList<Address>();
+        data = new ArrayList<>();
         Spinner_List();
 
         //플로팅버튼
