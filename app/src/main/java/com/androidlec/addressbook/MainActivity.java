@@ -3,46 +3,81 @@ package com.androidlec.addressbook;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
-
+import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
 import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
+import com.androidlec.addressbook.dto_sh.Address;
+import com.androidlec.addressbook.network_sh.NetworkTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
-
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
     String TAG = "Log Chk : ";
-    String urlAddr;
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
     ArrayList<String> tNames;
 
-    String tName1, tName2, tName3, tName4, tName5, tName6, tName7;
-
     private ActionBar actionBar;
 
-    private void init() {
-        actionBar = getSupportActionBar();
-    }
-
+    //스피너
     private Spinner spinner_tags;
-    String[] spinnerNames;
-    int[] spinnerImages;
+    public static String[] spinnerNames;
+
     int selected_tag_idx = 0;
 
+
+    //리스트뷰
+    private ArrayList<Address> data = null;
+    private AddressListAdapter adapter = null;
+    private ListView listView = null;
+
+    //datajsp
+    String centIP, urlAddr;
+
+
+    //플로팅버튼
     FloatingActionButton fladdBtn;
+
+    public static TypedArray tagImages;
+
+    TextView pre_cmt;
+
+
+    private void init() {
+        Resources res = getResources();
+
+        actionBar = getSupportActionBar();
+
+        //Log.v("MainActivity.java", LJH_data.getLoginId());
+
+        spinnerNames = res.getStringArray(R.array.maintaglist);
+        tagImages = res.obtainTypedArray(R.array.tag_array);
+        spinner_tags = findViewById(R.id.main_sp_taglist);
+
+        listView = findViewById(R.id.main_lv_addresslist);
+
+        fladdBtn = findViewById(R.id.main_fab_add);
+
+        centIP = "192.168.0.138";
+
+        // 태그 불러오기.
+//        onTagList();
+
+    }
 
 
     @Override
@@ -52,18 +87,47 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v("MainActivity.java", LJH_data.getLoginId());
         Log.v("MainActivity.java", Integer.toString(LJH_data.getLoginSeqno()));
-
-        Spinner_List();
-
         // 초기화
         init();
+
+
+        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
+        spinner_tags.setAdapter(customSpinnerAdapter);
+
+        spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selected_tag_idx = spinner_tags.getSelectedItemPosition();
+
+                if (selected_tag_idx == 0) {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
+                    //Log.v("status", urlAddr);
+                } else {
+                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + selected_tag_idx;
+                    //Log.v("status", urlAddr);
+                }
+                connectGetData();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        //리스트뷰
+        data = new ArrayList<>();
+        Spinner_List();
+
+        //플로팅버튼
+        fladdBtn.setOnClickListener(onClickListener);
 
         // 액션바
         actionBar.setTitle("내 주소록");
         actionBar.setElevation(0);
 
-        //floating Button
-        fladdBtn.setOnClickListener(onClickListener);
+        listView.setOnItemClickListener(lvOnItemClickListener);
 
 
     }
@@ -93,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_optionTag:
                 startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
                 break;
+            case R.id.menu_setting:
+                startActivity(new Intent(MainActivity.this, LJH_SettingActivity.class));
+                break;
             case R.id.menu_logout:
                 ljh_data.setLoginId("");
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -111,11 +178,7 @@ public class MainActivity extends AppCompatActivity {
         // 태그 불러오기.
         onTagList();
 
-        spinnerNames = new String[]{"전체보기", tName1, tName2, tName3, tName4, tName5, tName6, tName7};
-        spinnerImages = new int[]{R.drawable.ic_tag_black, R.drawable.ic_tag_red, R.drawable.ic_tag_orange, R.drawable.ic_tag_yellow, R.drawable.ic_tag_green, R.drawable.ic_tag_blue, R.drawable.ic_tag_purple, R.drawable.ic_tag_gray};
-
-
-        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, spinnerImages);
+        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
         spinner_tags.setAdapter(customSpinnerAdapter);
 
 
@@ -136,15 +199,15 @@ public class MainActivity extends AppCompatActivity {
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            // submit클릭 후 액션
-            Log.v("Chance", "onQueryTextSubmit : " + query);
+            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid="+ ljh_data.loginId +"&search=" + query;
+            //Log.v("status", urlAddr);
+            connectGetData();
             return false;
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
-            // 텍스트 입력할 때마다 액션
-            Log.v("Chance", "onQueryTextChange : " + newText);
+            //안함
             return false;
         }
     };
@@ -157,6 +220,22 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     };
+
+
+    private void connectGetData() {
+        //log.v("status", "connect GetData start");
+        try {
+            NetworkTask networkTask = new NetworkTask(MainActivity.this, urlAddr);
+            Object obj = networkTask.execute().get();
+            data = (ArrayList<Address>) obj;
+            adapter = new AddressListAdapter(MainActivity.this, R.layout.address_list_layout, data);
+            listView.setAdapter(adapter);
+            //log.v("status", "get data 끝");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }  // connectGetData
 
 
     private void onTagList() {
@@ -180,20 +259,37 @@ public class MainActivity extends AppCompatActivity {
             tNames.clear();
             tNames = (ArrayList<String>) obj; // cast.
 
-            tName1 = tNames.get(0);
-            tName2 = tNames.get(1);
-            tName3 = tNames.get(2);
-            tName4 = tNames.get(3);
-            tName5 = tNames.get(4);
-            tName6 = tNames.get(5);
-            tName7 = tNames.get(6);
+            spinnerNames[1] = tNames.get(0);
+            spinnerNames[2] = tNames.get(1);
+            spinnerNames[3] = tNames.get(2);
+            spinnerNames[4] = tNames.get(3);
+            spinnerNames[5] = tNames.get(4);
+            spinnerNames[6] = tNames.get(5);
+            spinnerNames[7] = tNames.get(6);
 
-            Log.v(TAG, "tName 입력완료.");
+            Log.v(TAG, "tag 대체 완료.");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }  // connectTagListData
 
+    ListView.OnItemClickListener lvOnItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);;
+
+            if (pre_cmt == null) {
+                pre_cmt = cmt;
+            } else {
+                pre_cmt.setVisibility(View.GONE);
+                pre_cmt = cmt;
+            }
+
+            cmt.setVisibility(View.VISIBLE);
+
+        }
+    };
 }//----
+

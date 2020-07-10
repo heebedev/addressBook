@@ -1,6 +1,7 @@
 package com.androidlec.addressbook.adapter_sh;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,12 @@ import com.androidlec.addressbook.R;
 public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
     String[] spinnerNames;
-    int[] spinnerImages;
+    TypedArray spinnerImages;
     Context mContext;
     LayoutInflater inflater;
 
 
-    public CustomSpinnerAdapter(@NonNull Context context,String[] names, int[] images) {
+    public CustomSpinnerAdapter(@NonNull Context context, String[] names, TypedArray images) {
         super(context, R.layout.spinner_row);
 
         this.spinnerNames = names;
@@ -61,7 +62,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
             mViewHolder = (ViewHolder) convertView.getTag();
         }
 
-        mViewHolder.mImage.setImageResource(spinnerImages[position]);
+        mViewHolder.mImage.setImageResource(spinnerImages.getResourceId(position, -1));
         mViewHolder.mName.setText(spinnerNames[position]);
 
         return convertView;

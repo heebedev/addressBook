@@ -35,6 +35,8 @@
             android:id="@+id/main_lv_addresslist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:dividerHeight="0px"
+            android:divider="#ffffff"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
