@@ -17,11 +17,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +37,7 @@ public class AddActivity extends AppCompatActivity {
     private ImageView ivAddImage;
     private TextInputEditText et_name, et_phone, et_email, et_comment;
 
+    String[] spinnerReNames;
     String[] spinnerNames;
     TypedArray spinnerImages;
 
@@ -55,6 +54,9 @@ public class AddActivity extends AppCompatActivity {
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
     private  ArrayList<String> tagList;
 
+    //3개 이상 클릭 방지
+    int tagclick = 0;
+
     private void init() {
         Resources res = getResources();
 
@@ -63,10 +65,10 @@ public class AddActivity extends AppCompatActivity {
         ivAddImage = findViewById(R.id.iv_addAddress_image);
 
 
-        spinnerNames = MainActivity.spinnerNames;
+        spinnerReNames = MainActivity.spinnerNames;
         spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
-        spinnerNames[0] = "태그 없음";
+        spinnerReNames[0] = "태그 없음";
 
         et_name = findViewById(R.id.et_addAddress_name);
         et_phone = findViewById(R.id.et_addAddress_phone);
@@ -74,18 +76,29 @@ public class AddActivity extends AppCompatActivity {
         et_comment = findViewById(R.id.et_addAddress_cmt);
 
 
-        for (int iv_tag : iv_tags) {
-            findViewById(iv_tag).setOnClickListener(new View.OnClickListener() {
+        for (int i = 0; i < iv_tags.length; i++) {
+            final int finalI = i;
+            findViewById(iv_tags[i]).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(v.isSelected()){
                         v.setSelected(false);
+                        tagclick--;
                     } else {
-                        v.setSelected(true);
+                        if (tagclick < 3) {
+                            int pos = finalI + 1;
+                            v.setSelected(true);
+                            Toast.makeText(AddActivity.this, spinnerReNames[pos], Toast.LENGTH_SHORT).show();
+                            tagclick++;
+                        } else {
+                            Toast.makeText(AddActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
+
                 }
             });
         }
+
     }
 
     public boolean checkPermission() {

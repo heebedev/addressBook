@@ -1,7 +1,6 @@
 package com.androidlec.addressbook;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -35,6 +34,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
+    ArrayList<String> tNames;
 
     private ActionBar actionBar;
 
@@ -85,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // 초기화
         init();
 
@@ -156,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_optionTag:
                 startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
                 break;
+            case R.id.menu_setting:
+                startActivity(new Intent(MainActivity.this, LJH_SettingActivity.class));
+                break;
             case R.id.menu_logout:
                 ljh_data.setLoginId("");
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -171,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags = findViewById(R.id.main_sp_taglist);
         fladdBtn = findViewById(R.id.main_fab_add);
 
+        spinnerNames[0] = "전체보기";
+
         // 태그 불러오기.
         onTagList();
 
@@ -181,10 +185,15 @@ public class MainActivity extends AppCompatActivity {
         spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, spinnerNames[position], Toast.LENGTH_SHORT).show();
+
+
                 if (position == 0) {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
                 } else {
+
                     urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid=" + ljh_data.loginId + "&aTag=" + position;
+
                 }
                 connectGetData();
             }
@@ -248,7 +257,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
             Object obj = tagListNetworkTask.execute().get();
-            ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
+            tNames = new ArrayList<String>();
+            tNames.clear();
+            tNames = (ArrayList<String>) obj; // cast.
 
             spinnerNames[1] = tNames.get(0);
             spinnerNames[2] = tNames.get(1);
