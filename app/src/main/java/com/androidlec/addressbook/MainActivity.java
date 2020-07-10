@@ -4,6 +4,7 @@ package com.androidlec.addressbook;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +14,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setElevation(0);
 
         listView.setOnItemClickListener(lvOnItemClickListener);
-
+        listView.setOnItemLongClickListener(itemLongClickListener);
 
     }
 
@@ -121,27 +121,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.menu_instruction:
-//                new AlertDialog.Builder(MainActivity.this)
-//                        .setTitle("사용방법")
-//                        .setMessage("")
-//                        .setCancelable(false)
-//                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                EditText et_1 = linearLayout.findViewById(R.id.et_1);
-//                                EditText et_2 = linearLayout.findViewById(R.id.et_2);
-//
-//                                int num1 = Integer.parseInt(et_1.getText().toString());
-//                                int num2 = Integer.parseInt(et_2.getText().toString());
-//                                int result = num1 + num2;
-//
-//                                textView.setText(num1 + " + " + num2 + " = " +result);
-//                            }
-//                        })
-//                        .setNegativeButton("취소", null)
-//                        .show();
-//                break;
             case R.id.menu_optionTag:
                 startActivity(new Intent(MainActivity.this, TagOptionDialog.class));
                 break;
@@ -276,10 +255,53 @@ public class MainActivity extends AppCompatActivity {
                 pre_cmt.setVisibility(View.GONE);
                 pre_cmt = cmt;
             }
-
             cmt.setVisibility(View.VISIBLE);
-
         }
     };
+
+    ListView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+            String[] options = {"전화걸기", "수정", "삭제"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case 0:
+                            String tel = "tel:" + data.get(position).getAphone();
+                            startActivity(new Intent("android.intent.action.DIAL", Uri.parse(tel)));
+                            break;
+                        case 1:
+                            Intent updateIntent = new Intent(getApplicationContext(), UpdateActivity.class);
+                            updateIntent.putExtra("seq", data.get(position).getAseqno());
+                            startActivity(updateIntent);
+                            break;
+                        case 2:
+                            deleteFromDB(data.get(position).getAseqno());
+                            break;
+                    }
+                }
+            });
+            builder.create().show();
+            return true;
+        }
+    };
+
+    private void deleteFromDB(int seq) {
+        String urlAddr = "http://192.168.0.79:8080/test/csDeleteAddressBook.jsp?";
+
+        urlAddr = urlAddr + "seq=" + seq;
+
+        try {
+            CSNetworkTask csNetworkTask = new CSNetworkTask(MainActivity.this, urlAddr);
+            csNetworkTask.execute().get(); // doInBackground 의 리턴값
+            onResume();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }//----
 

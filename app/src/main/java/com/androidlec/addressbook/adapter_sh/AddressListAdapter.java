@@ -1,8 +1,12 @@
 package com.androidlec.addressbook.adapter_sh;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.androidlec.addressbook.AddActivity;
 import com.androidlec.addressbook.MainActivity;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.dto_sh.Address;
@@ -37,7 +42,7 @@ public class AddressListAdapter extends BaseAdapter {
     public TextView tvcmt;
     
 
-    private String baseurl = "http://192.168.0.82:8080/Hello/imgs/";
+    public static String baseurl = "http://192.168.0.82:8080/Hello/imgs/";
 
     public AddressListAdapter(Context mContext, int layout, ArrayList<Address> data) {
         this.mContext = mContext;

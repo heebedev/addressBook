@@ -21,7 +21,6 @@ public class LJH_SettingActivity extends AppCompatActivity {
 
     private TextInputEditText et_id, et_password;
     private Button btn_change, btn_delete;
-    String TAG = "Log Chk : ";
     String urlAddr;
     LJH_data ljh_data;
 
@@ -53,7 +52,6 @@ public class LJH_SettingActivity extends AppCompatActivity {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.v(TAG, "onClick()");
 
             switch (v.getId()) {
                 case R.id.setting_btn_change:
@@ -87,13 +85,11 @@ public class LJH_SettingActivity extends AppCompatActivity {
 
 
     private void changePw(){
-        Log.v(TAG, "changePw()");
 
         String newPw = et_password.getText().toString();
 
         urlAddr = "http://192.168.0.178:8080/Test/changePw.jsp?";
         urlAddr = urlAddr + "id=" + ljh_data.getLoginId() + "&pw=" + newPw;
-        Log.v(TAG, urlAddr);
 
         connectChangePwData();
     }
@@ -110,11 +106,9 @@ public class LJH_SettingActivity extends AppCompatActivity {
 
 
     private void deleteId(){
-        Log.v(TAG, "changePw()");
 
         urlAddr = "http://192.168.0.178:8080/Test/deleteId.jsp?";
         urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
-        Log.v(TAG, urlAddr);
 
         connectDeleteIdData();
     }

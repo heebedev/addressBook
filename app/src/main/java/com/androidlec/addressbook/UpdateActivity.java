@@ -1,18 +1,13 @@
 package com.androidlec.addressbook;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +18,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.androidlec.addressbook.FTP_JHJ.ConnectFTP;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -31,14 +32,16 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class AddActivity extends AppCompatActivity {
+public class UpdateActivity extends AppCompatActivity {
 
     private TextView tvbtregister, tvbtcancle;
-    private ImageView ivAddImage;
-    private TextInputEditText et_name, et_phone, et_email, et_comment;
+    public static ImageView ivAddImage;
+    public static TextInputEditText et_name, et_phone, et_email, et_comment;
 
     String[] spinnerReNames;
     TypedArray spinnerImages;
+
+    String seq;
 
     // 카메라 관련
     private static final int PERMISSION_REQUST_CODE = 100;
@@ -46,12 +49,12 @@ public class AddActivity extends AppCompatActivity {
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
 
     private Uri image_uri;
-    
+
     private int mWhich;
 
     // Register
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
-    private  ArrayList<String> tagList;
+    private ArrayList<String> tagList;
 
     int tagClick = 0;
 
@@ -88,14 +91,13 @@ public class AddActivity extends AppCompatActivity {
                             v.setSelected(true);
                             tagClick++;
                         } else {
-                            Toast.makeText(AddActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(UpdateActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                 }
             });
         }
-
     }
 
     public boolean checkPermission() {
@@ -143,11 +145,10 @@ public class AddActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_update);
 
         // 키보드 화면 가림막기
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -157,6 +158,11 @@ public class AddActivity extends AppCompatActivity {
         tvbtregister.setOnClickListener(onClickListener);
         tvbtcancle.setOnClickListener(onClickListener);
         ivAddImage.setOnClickListener(onClickListener);
+
+        Intent intent = getIntent();
+        seq = String.valueOf(intent.getIntExtra("seq", 0));
+
+        getData(seq);
 
     }
 
@@ -168,7 +174,7 @@ public class AddActivity extends AppCompatActivity {
                     showImagePicDialog();
                     break;
                 case R.id.tvbt_addAddress_update:
-                    inputNewData();
+                    updateData(seq);
                     break;
                 case R.id.tvbt_addAddress_cancel :
                     finish();
@@ -177,13 +183,12 @@ public class AddActivity extends AppCompatActivity {
         }
     };
 
-    private void inputNewData() {
+    private void updateData(String seq) {
         String name = et_name.getText().toString().trim();
         String phone = et_phone.getText().toString().trim();
         String email = et_email.getText().toString().trim();
         String comment = et_comment.getText().toString().trim();
-        String userId = LJH_data.getLoginId();
-        int userSeq = LJH_data.getLoginSeqno();
+
         if(tagSelectedOK()){
             String tagListString = tagList.toString();
             tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
@@ -194,9 +199,9 @@ public class AddActivity extends AppCompatActivity {
             } else if(TextUtils.isEmpty(phone)){
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(image_uri == null){
-                uploadToDB(name, phone, email, comment, "", tagListString, userId, userSeq);
+                updateToDB(name, phone, email, comment, tagListString, seq);
             } else {
-                ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                ConnectFTP mConnectFTP = new ConnectFTP(UpdateActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                 String fileName = "";
                 try {
                     fileName = mConnectFTP.execute().get();
@@ -205,10 +210,9 @@ public class AddActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                uploadToDB(name, phone, email, comment, fileName, tagListString, userId, userSeq);
+                updateToDB2(name, phone, email, comment, fileName, tagListString, seq);
             }
         }
-
     }
 
     private boolean tagSelectedOK() {
@@ -232,13 +236,40 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
-    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags, String userId, int userSeq) {
-        String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
+    private void getData(String seq) {
+        String urlAddr = "http://192.168.0.79:8080/test/csGetAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&userId=" + userId + "&userSeq=" + userSeq;
+        urlAddr = urlAddr + "seq=" + seq;
 
         try {
-            CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);
+            CSUpdateNetworkTask csNetworkTask = new CSUpdateNetworkTask(UpdateActivity.this, urlAddr);
+            csNetworkTask.execute().get(); // doInBackground 의 리턴값
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateToDB2(String name, String phone, String email, String comment, String fileName, String tags, String seq) {
+        String urlAddr = "http://192.168.0.79:8080/test/csUpdateAddressBook.jsp?";
+
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&seq=" + seq;
+
+        try {
+            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
+            csNetworkTask.execute().get(); // doInBackground 의 리턴값
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateToDB(String name, String phone, String email, String comment, String tags, String seq) {
+        String urlAddr = "http://192.168.0.79:8080/test/csUpdate2AddressBook.jsp?";
+
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&tags=" + tags + "&seq=" + seq;
+
+        try {
+            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
             csNetworkTask.execute().get(); // doInBackground 의 리턴값
             finish();
         } catch (Exception e) {
@@ -249,7 +280,7 @@ public class AddActivity extends AppCompatActivity {
     private void showImagePicDialog() {
         String[] options = {"카메라에서 촬영", "갤러리에서 선택"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(AddActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(UpdateActivity.this);
         builder.setTitle("이미지 등록");
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
