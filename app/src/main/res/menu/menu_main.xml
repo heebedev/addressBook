@@ -10,10 +10,6 @@
         app:actionViewClass="android.widget.SearchView" />
 
     <item
-        android:id="@+id/menu_instruction"
-        android:title="사용방법" />
-
-    <item
         android:id="@+id/menu_optionTag"
         android:title="태그변경" />
 
