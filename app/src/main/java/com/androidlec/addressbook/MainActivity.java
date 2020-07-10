@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     String TAG = "Log Chk : ";
     String urlAddr;
     LJH_data ljh_data; // 아이디값 불러오는 클래스.
+    ArrayList<String> tNames;
 
     String tName1, tName2, tName3, tName4, tName5, tName6, tName7;
 
@@ -175,7 +176,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             LJH_TagNetwork tagListNetworkTask = new LJH_TagNetwork(MainActivity.this, urlAddr);
             Object obj = tagListNetworkTask.execute().get();
-            ArrayList<String> tNames = (ArrayList<String>) obj; // cast.
+            tNames = new ArrayList<String>();
+            tNames.clear();
+            tNames = (ArrayList<String>) obj; // cast.
 
             tName1 = tNames.get(0);
             tName2 = tNames.get(1);
