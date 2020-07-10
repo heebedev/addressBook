@@ -13,7 +13,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,14 +20,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidlec.addressbook.FTP_JHJ.ConnectFTP;
-import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.textfield.TextInputEditText;
@@ -167,35 +164,35 @@ public class AddActivity extends AppCompatActivity {
         String phone = et_phone.getText().toString().trim();
         String email = et_email.getText().toString().trim();
         String comment = et_comment.getText().toString().trim();
-        if(tagSeletedOK()){
-            Log.e("Chance", tagList.toString());
-        } else {
+        if(tagSelectedOK()){
+            Log.e("Chance", tagList.toString().substring(0, -1));
 
-        }
-
-        if(TextUtils.isEmpty(name)){
-            Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-        } else if(TextUtils.isEmpty(phone)){
-            Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
-        } else if(image_uri == null){
-            uploadToDB(name, phone, email, comment, "");
-        } else {
-            //                                       context                    ip                  hostname          hostpw                port    uri(file)
-            ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
-            String fileName = "";
-            try {
-                fileName = mConnectFTP.execute().get();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if(TextUtils.isEmpty(name)){
+                Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            } else if(TextUtils.isEmpty(phone)){
+                Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            } else if(image_uri == null){
+                //uploadToDB(name, phone, email, comment, "");
+            } else {
+                //                                       context                    ip                  hostname          hostpw                port    uri(file)
+                ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                String fileName = "";
+                try {
+                    fileName = mConnectFTP.execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //uploadToDB(name, phone, email, comment, fileName);
             }
-            uploadToDB(name, phone, email, comment, fileName);
+        } else {
+
         }
 
     }
 
-    private boolean tagSeletedOK() {
+    private boolean tagSelectedOK() {
 
         tagList = new ArrayList<>();
 
@@ -216,10 +213,10 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
-    private void uploadToDB(String name, String phone, String email, String comment, String fileName) {
+    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags) {
         String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName;
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags;
 
         try {
             CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);
