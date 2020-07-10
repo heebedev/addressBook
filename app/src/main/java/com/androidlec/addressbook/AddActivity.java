@@ -25,7 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidlec.addressbook.ftp_jhj.ConnectFTP;
+import com.androidlec.addressbook.FTP_JHJ.ConnectFTP;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.textfield.TextInputEditText;
