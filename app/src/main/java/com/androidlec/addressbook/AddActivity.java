@@ -17,22 +17,27 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidlec.addressbook.adapter_sh.CustomSpinnerAdapter;
+import com.androidlec.addressbook.FTP_JHJ.ConnectFTP;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class AddActivity extends AppCompatActivity {
 
     private TextView tvbtregister, tvbtcancle;
     private ImageView ivAddImage;
+    private TextInputEditText et_name, et_phone, et_email, et_comment;
 
     private Spinner spinner_tags;
     String[] spinnerNames;
@@ -46,7 +51,9 @@ public class AddActivity extends AppCompatActivity {
 
     private Uri image_uri;
 
-
+    // Register
+    private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
+    private  ArrayList<String> tagList;
 
     private void init() {
         Resources res = getResources();
@@ -55,12 +62,30 @@ public class AddActivity extends AppCompatActivity {
         tvbtcancle = findViewById(R.id.tvbt_addAddress_cancel);
         ivAddImage = findViewById(R.id.iv_addAddress_image);
 
-        spinner_tags = findViewById(R.id.add_sp_taglist);
+
         spinnerNames = MainActivity.spinnerNames;
         spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
         spinnerNames[0] = "태그 없음";
 
+        et_name = findViewById(R.id.et_addAddress_name);
+        et_phone = findViewById(R.id.et_addAddress_phone);
+        et_email = findViewById(R.id.et_addAddress_email);
+        et_comment = findViewById(R.id.et_addAddress_cmt);
+
+
+        for (int iv_tag : iv_tags) {
+            findViewById(iv_tag).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(v.isSelected()){
+                        v.setSelected(false);
+                    } else {
+                        v.setSelected(true);
+                    }
+                }
+            });
+        }
     }
 
     public boolean checkPermission() {
@@ -96,6 +121,7 @@ public class AddActivity extends AppCompatActivity {
             for (int i = 0; i < length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     // 동의
+                    showImagePicDialog();
                 }
             }
         }
@@ -117,28 +143,7 @@ public class AddActivity extends AppCompatActivity {
 
         tvbtregister.setOnClickListener(onClickListener);
         tvbtcancle.setOnClickListener(onClickListener);
-
-
-        spinner_tags = findViewById(R.id.add_sp_taglist);
-
         ivAddImage.setOnClickListener(onClickListener);
-
-
-        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(AddActivity.this, spinnerNames, spinnerImages);
-        spinner_tags.setAdapter(customSpinnerAdapter);
-
-        spinner_tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selected_tag_idx = spinner_tags.getSelectedItemPosition();
-                Toast.makeText(AddActivity.this, spinnerNames[selected_tag_idx], Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
     }
 
@@ -150,6 +155,7 @@ public class AddActivity extends AppCompatActivity {
                     showImagePicDialog();
                     break;
                 case R.id.tvbt_addAddress_register :
+                    inputNewData();
                     break;
                 case R.id.tvbt_addAddress_cancel :
                     finish();
@@ -158,11 +164,79 @@ public class AddActivity extends AppCompatActivity {
         }
     };
 
+    private void inputNewData() {
+        String name = et_name.getText().toString().trim();
+        String phone = et_phone.getText().toString().trim();
+        String email = et_email.getText().toString().trim();
+        String comment = et_comment.getText().toString().trim();
+        if(tagSelectedOK()){
+            Log.e("Chance", tagList.toString().substring(0, -1));
+
+            if(TextUtils.isEmpty(name)){
+                Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            } else if(TextUtils.isEmpty(phone)){
+                Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            } else if(image_uri == null){
+                //uploadToDB(name, phone, email, comment, "");
+            } else {
+                //                                       context                    ip                  hostname          hostpw                port    uri(file)
+                ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                String fileName = "";
+                try {
+                    fileName = mConnectFTP.execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //uploadToDB(name, phone, email, comment, fileName);
+            }
+        } else {
+
+        }
+
+    }
+
+    private boolean tagSelectedOK() {
+
+        tagList = new ArrayList<>();
+
+        for (int i = 0; i < iv_tags.length; i++) {
+            if (findViewById(iv_tags[i]).isSelected()){
+                tagList.add(String.valueOf(i+1));
+            }
+        }
+
+        if (tagList.size() == 0){
+            tagList.add("0");
+            return true;
+        } else if(tagList.size() > 3){
+            Toast.makeText(this, "태그는 최대 3만 선택 가능합니다.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags) {
+        String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
+
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags;
+
+        try {
+            CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);
+            csNetworkTask.execute().get(); // doInBackground 의 리턴값
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void showImagePicDialog() {
-        String[] options = {"Camera", "Gallery"};
+        String[] options = {"카메라에서 촬영", "갤러리에서 선택"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(AddActivity.this);
-        builder.setTitle("Pick Image From");
+        builder.setTitle("이미지 등록");
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -172,9 +246,10 @@ public class AddActivity extends AppCompatActivity {
                     } else {
                         pickFromGallery();
                     }
-                } else {
-                    Toast.makeText(AddActivity.this, "권한 요청을 동의해주세요.", Toast.LENGTH_SHORT).show();
                 }
+//                else {
+//                    Toast.makeText(AddActivity.this, "권한 요청을 동의해주세요.", Toast.LENGTH_SHORT).show();
+//                }
 
             }
         });
@@ -189,6 +264,7 @@ public class AddActivity extends AppCompatActivity {
                 assert data != null;
                 image_uri = data.getData();
             }
+
             Glide.with(this)
                     .load(image_uri.toString())
                     .apply(new RequestOptions().circleCrop())
