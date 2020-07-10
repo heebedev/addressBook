@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Log.v("MainActivity.java", LJH_data.getLoginId());
+        Log.v("MainActivity.java", Integer.toString(LJH_data.getLoginSeqno()));
 
         Spinner_List();
 
