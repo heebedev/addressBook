@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         actionBar = getSupportActionBar();
 
-        //Log.v("MainActivity.java", LJH_data.getLoginId());
-
         spinnerNames = res.getStringArray(R.array.maintaglist);
         tagImages = res.obtainTypedArray(R.array.tag_array);
         spinner_tags = findViewById(R.id.main_sp_taglist);
@@ -72,9 +70,6 @@ public class MainActivity extends AppCompatActivity {
         fladdBtn = findViewById(R.id.main_fab_add);
 
         centIP = "192.168.0.138";
-
-        // 태그 불러오기.
-//        onTagList();
 
     }
 
@@ -98,10 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if (selected_tag_idx == 0) {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + ljh_data.loginId;
-                    //Log.v("status", urlAddr);
                 } else {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid="+ ljh_data.loginId +"&aTag=" + selected_tag_idx;
-                    //Log.v("status", urlAddr);
                 }
                 connectGetData();
 
@@ -217,14 +210,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void connectGetData() {
-        //log.v("status", "connect GetData start");
         try {
             NetworkTask networkTask = new NetworkTask(MainActivity.this, urlAddr);
             Object obj = networkTask.execute().get();
             data = (ArrayList<Address>) obj;
             adapter = new AddressListAdapter(MainActivity.this, R.layout.address_list_layout, data);
             listView.setAdapter(adapter);
-            //log.v("status", "get data 끝");
         } catch (Exception e) {
             e.printStackTrace();
         }

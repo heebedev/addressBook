@@ -50,6 +50,8 @@ public class AddActivity extends AppCompatActivity {
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
 
     private Uri image_uri;
+    
+    private int mWhich;
 
     // Register
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
@@ -121,7 +123,13 @@ public class AddActivity extends AppCompatActivity {
             for (int i = 0; i < length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     // 동의
-                    showImagePicDialog();
+                    if(mWhich == 0){
+                        pickFromCamera();
+                    } else {
+                        pickFromGallery();
+                    }
+                } else {
+                    Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -132,9 +140,6 @@ public class AddActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
-
-
-
 
         // 키보드 화면 가림막기
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -169,17 +174,19 @@ public class AddActivity extends AppCompatActivity {
         String phone = et_phone.getText().toString().trim();
         String email = et_email.getText().toString().trim();
         String comment = et_comment.getText().toString().trim();
+        String userId = LJH_data.getLoginId();
         if(tagSelectedOK()){
-            Log.e("Chance", tagList.toString().substring(0, -1));
+            String tagListString = tagList.toString();
+            tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
+            tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
 
             if(TextUtils.isEmpty(name)){
                 Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(TextUtils.isEmpty(phone)){
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(image_uri == null){
-                //uploadToDB(name, phone, email, comment, "");
+                uploadToDB(name, phone, email, comment, "", tagListString, userId);
             } else {
-                //                                       context                    ip                  hostname          hostpw                port    uri(file)
                 ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                 String fileName = "";
                 try {
@@ -189,10 +196,8 @@ public class AddActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //uploadToDB(name, phone, email, comment, fileName);
+                uploadToDB(name, phone, email, comment, fileName, tagListString, userId);
             }
-        } else {
-
         }
 
     }
@@ -218,10 +223,10 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
-    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags) {
+    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags, String userId) {
         String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags;
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&userId=" + userId;
 
         try {
             CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);
@@ -243,14 +248,12 @@ public class AddActivity extends AppCompatActivity {
                 if(checkPermission()){
                     if(which == 0){
                         pickFromCamera();
+                        mWhich = 0;
                     } else {
                         pickFromGallery();
+                        mWhich = 1;
                     }
                 }
-//                else {
-//                    Toast.makeText(AddActivity.this, "권한 요청을 동의해주세요.", Toast.LENGTH_SHORT).show();
-//                }
-
             }
         });
         builder.create().show();
@@ -258,7 +261,6 @@ public class AddActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                 assert data != null;
