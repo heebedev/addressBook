@@ -3,6 +3,8 @@ package com.androidlec.addressbook;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import androidx.core.app.ActivityCompat;
@@ -17,6 +19,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -72,7 +75,6 @@ public class AddActivity extends AppCompatActivity {
         et_phone = findViewById(R.id.et_addAddress_phone);
         et_email = findViewById(R.id.et_addAddress_email);
         et_comment = findViewById(R.id.et_addAddress_cmt);
-
 
         for (int i = 0; i < iv_tags.length; i++) {
             final int finalI = i;
@@ -196,6 +198,7 @@ public class AddActivity extends AppCompatActivity {
             } else if(image_uri == null){
                 uploadToDB(name, phone, email, comment, "", tagListString, userId, userSeq);
             } else {
+                Log.e("Chance", "1");
                 ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                 String fileName = "";
                 try {
