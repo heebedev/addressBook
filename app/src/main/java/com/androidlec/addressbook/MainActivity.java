@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         // 초기화
         init();
 
-
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, spinnerNames, tagImages);
         spinner_tags.setAdapter(customSpinnerAdapter);
 
