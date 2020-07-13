@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         //리스트뷰
         data = new ArrayList<>();
         Spinner_List();
-        connectGetData();
 
         //플로팅버튼
         fladdBtn.setOnClickListener(onClickListener);
