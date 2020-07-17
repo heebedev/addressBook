@@ -64,8 +64,8 @@ public class AddressListAdapter extends BaseAdapter {
 
         ivpfimage = convertView.findViewById(R.id.iv_addresslist_pfimage);
         tvname = convertView.findViewById(R.id.tv_addresslist_name);
-        tvphone = convertView.findViewById(R.id.tv_addresslist_email);
-        tvemail = convertView.findViewById(R.id.tv_addresslist_phone);
+        tvphone = convertView.findViewById(R.id.tv_addresslist_phone);
+        tvemail = convertView.findViewById(R.id.tv_addresslist_email);
         ivpftag1 = convertView.findViewById(R.id.iv_addresslist_tag1);
         ivpftag2 = convertView.findViewById(R.id.iv_addresslist_tag2);
         ivpftag3 = convertView.findViewById(R.id.iv_addresslist_tag3);
@@ -74,8 +74,16 @@ public class AddressListAdapter extends BaseAdapter {
 
         tvname.setText(data.get(position).getAname());
         tvphone.setText(data.get(position).getAphone());
-        tvemail.setText(data.get(position).getAemail());
-        tvcmt.setText(data.get(position).getAmemo());
+        if(data.get(position).getAemail().length() == 0){
+            tvemail.setText("-");
+        } else {
+            tvemail.setText(data.get(position).getAemail());
+        }
+        if(data.get(position).getAmemo().length() == 0){
+            tvcmt.setText("-");
+        } else {
+            tvcmt.setText(data.get(position).getAmemo());
+        }
 
         String url = StaticData.BASE_URL + data.get(position).getAimage();
 

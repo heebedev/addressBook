@@ -1,8 +1,10 @@
 package com.androidlec.addressbook.Activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,7 +28,7 @@ import androidx.core.content.ContextCompat;
 
 import com.androidlec.addressbook.CS.CSNetworkTask;
 import com.androidlec.addressbook.CS.CSUpdateNetworkTask;
-import com.androidlec.addressbook.JHJ_FTP.ConnectFTP;
+import com.androidlec.addressbook.JHJ_FTP.UpdateConnectFTP;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.SH_dto.Address;
 import com.androidlec.addressbook.StaticData;
@@ -35,10 +37,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 public class UpdateActivity extends AppCompatActivity {
 
+    private static String name, phone, email, comment, tagListString, seq;
     // xml
     private TextView tvbtregister, tvbtcancle;
     private ImageView ivAddImage;
@@ -59,9 +61,6 @@ public class UpdateActivity extends AppCompatActivity {
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
     private ArrayList<String> tagList;
     private int tagClick = 0;
-
-    // 가져온 시퀀스 번호
-    private String seq;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,13 +236,13 @@ public class UpdateActivity extends AppCompatActivity {
     } // 가져온 데이터 나타내기
 
     private void updateData(String seq) {
-        String name = et_name.getText().toString().trim();
-        String phone = et_phone.getText().toString().trim();
-        String email = et_email.getText().toString().trim();
-        String comment = et_comment.getText().toString().trim();
+        name = et_name.getText().toString().trim();
+        phone = et_phone.getText().toString().trim();
+        email = et_email.getText().toString().trim();
+        comment = et_comment.getText().toString().trim();
 
         if (tagSelectedOK()) {
-            String tagListString = tagList.toString();
+            tagListString = tagList.toString();
             tagListString = tagListString.substring(1, tagListString.length() - 1); // 앞뒤 [] 제거
             tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
 
@@ -253,18 +252,14 @@ public class UpdateActivity extends AppCompatActivity {
             } else if (TextUtils.isEmpty(phone)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if (image_uri == null) {
-                updateToDB(name, phone, email, comment, "", tagListString, seq);
+                updateToDB(UpdateActivity.this, "");
             } else {
-                ConnectFTP mConnectFTP = new ConnectFTP(UpdateActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
-                String fileName = "";
                 try {
-                    fileName = mConnectFTP.execute().get();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
+                    UpdateConnectFTP updateConnectFTP = new UpdateConnectFTP(UpdateActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                    updateConnectFTP.execute();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-                updateToDB(name, phone, email, comment, fileName, tagListString, seq);
             }
         }
     } // 데이터 수정 액션
@@ -290,15 +285,15 @@ public class UpdateActivity extends AppCompatActivity {
         return true;
     } // 태그 리스트
 
-    private void updateToDB(String name, String phone, String email, String comment, String fileName, String tags, String seq) {
+    public static void updateToDB(Context mContext, String fileName) {
         String urlAddr = "http://192.168.0.79:8080/test/csUpdateAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&seq=" + seq;
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tagListString + "&seq=" + seq;
 
         try {
-            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
-            csNetworkTask.execute().get(); // doInBackground 의 리턴값
-            finish();
+            CSNetworkTask csNetworkTask = new CSNetworkTask(mContext, urlAddr);
+            csNetworkTask.execute(); // doInBackground 의 리턴값
+            ((Activity) mContext).finish();
         } catch (Exception e) {
             e.printStackTrace();
         }

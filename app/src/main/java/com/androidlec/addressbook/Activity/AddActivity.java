@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import androidx.core.app.ActivityCompat;
@@ -25,7 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidlec.addressbook.CS.CSNetworkTask;
-import com.androidlec.addressbook.JHJ_FTP.ConnectFTP;
+import com.androidlec.addressbook.JHJ_FTP.AddConnectFTP;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.StaticData;
 import com.bumptech.glide.Glide;
@@ -33,10 +35,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 public class AddActivity extends AppCompatActivity {
 
+    private static String name, phone, email, comment, tagListString;
     // xml
     private TextView tv_bt_register, tv_bt_cancle;
     private ImageView ivAddImage;
@@ -179,15 +181,13 @@ public class AddActivity extends AppCompatActivity {
     } // 카메라, 저장소 권한확인
 
     private void inputNewData() {
-        String name = et_name.getText().toString().trim();
-        String phone = et_phone.getText().toString().trim();
-        String email = et_email.getText().toString().trim();
-        String comment = et_comment.getText().toString().trim();
-        String userId = StaticData.USER_ID;
-        int userSeq = StaticData.USER_SEQ;
+        name = et_name.getText().toString().trim();
+        phone = et_phone.getText().toString().trim();
+        email = et_email.getText().toString().trim();
+        comment = et_comment.getText().toString().trim();
 
         if(tagSelectedOK()){
-            String tagListString = tagList.toString();
+            tagListString = tagList.toString();
             tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
             tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
 
@@ -197,18 +197,14 @@ public class AddActivity extends AppCompatActivity {
             } else if(TextUtils.isEmpty(phone)){
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if(image_uri == null){
-                uploadToDB(name, phone, email, comment, "", tagListString, userId, userSeq);
+                uploadToDB(AddActivity.this, "");
             } else {
-                ConnectFTP mConnectFTP = new ConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
-                String fileName = "";
                 try {
-                    fileName = mConnectFTP.execute().get();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
+                    AddConnectFTP addConnectFTP = new AddConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                    addConnectFTP.execute();
+                } catch (Exception e){
                     e.printStackTrace();
                 }
-                uploadToDB(name, phone, email, comment, fileName, tagListString, userId, userSeq);
             }
         }
     } // 데이터 입력 액션
@@ -234,16 +230,16 @@ public class AddActivity extends AppCompatActivity {
         return true;
     } // 태그 리스트
 
-    private void uploadToDB(String name, String phone, String email, String comment, String fileName, String tags, String userId, int userSeq) {
+    public static void uploadToDB(Context mContext, String fileName) {
         String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&userId=" + userId + "&userSeq=" + userSeq;
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tagListString + "&userId=" + StaticData.USER_ID + "&userSeq=" + StaticData.USER_SEQ;
 
         try {
-            CSNetworkTask csNetworkTask = new CSNetworkTask(AddActivity.this, urlAddr);
-            csNetworkTask.execute().get(); // doInBackground 의 리턴값
-            Toast.makeText(this, name + " 연락처를 추가했습니다.", Toast.LENGTH_SHORT).show();
-            finish();
+            CSNetworkTask csNetworkTask = new CSNetworkTask(mContext, urlAddr);
+            csNetworkTask.execute(); // doInBackground 의 리턴값
+            Toast.makeText(mContext, name + " 연락처를 추가했습니다.", Toast.LENGTH_SHORT).show();
+            ((Activity) mContext).finish();
         } catch (Exception e) {
             e.printStackTrace();
         }

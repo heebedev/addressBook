@@ -173,7 +173,8 @@
             android:paddingBottom="8dp"
             android:text="취소"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:background="?attr/selectableItemBackground" />
 
         <View
             android:layout_width="100dp"
@@ -189,7 +190,8 @@
             android:paddingBottom="8dp"
             android:text="수정"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:background="?attr/selectableItemBackground" />
 
 
     </LinearLayout>

@@ -4,6 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.androidlec.addressbook.Activity.AddActivity;
+import com.androidlec.addressbook.Activity.UpdateActivity;
+import com.androidlec.addressbook.StaticData;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -12,7 +17,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ConnectFTP extends AsyncTask<Integer, String, String> {
+public class UpdateConnectFTP extends AsyncTask<Integer, String, String> {
 
     private FTPClient mFTPClient;
 
@@ -25,7 +30,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
 
     private ProgressDialog progressDialog;
 
-    public ConnectFTP(Context context, String host, String username, String password, int port, Uri file) {
+    public UpdateConnectFTP(Context context, String host, String username, String password, int port, Uri file) {
         this.context = context;
         this.host = host;
         this.username = username;
@@ -44,8 +49,9 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
     }
 
     @Override
-    protected void onPostExecute(String aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(String formatDate) {
+        super.onPostExecute(formatDate);
+        UpdateActivity.updateToDB(context, formatDate);
         progressDialog.dismiss();
     }
 

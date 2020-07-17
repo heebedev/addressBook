@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 액션바
         actionBar.setTitle("내 주소록");
-        actionBar.setElevation(0);
 
         // 리스트뷰 클릭 리스너
         listView.setOnItemClickListener(lvOnItemClickListener);
@@ -284,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
                 pre_cmt.setVisibility(View.GONE);
                 pre_cmt = cmt;
             }
+            cmt.setVisibility(View.VISIBLE);
         }
     };
 

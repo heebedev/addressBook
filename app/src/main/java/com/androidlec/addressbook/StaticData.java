@@ -10,4 +10,6 @@ public class StaticData {
 
     // URL
     public static String BASE_URL = "http://192.168.0.82:8080/Hello/imgs/";
+
+    public static String FILE_NAME = "";
 }
