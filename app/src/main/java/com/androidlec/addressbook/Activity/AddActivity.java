@@ -81,19 +81,25 @@ public class AddActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //권한을 허용 했을 경우
+        boolean[] checkOK = {false, false, false};
         if (requestCode == PERMISSION_REQUST_CODE) {
             int length = permissions.length;
             for (int i = 0; i < length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    // 동의
-                    if(mWhich == 0){
-                        pickFromCamera();
-                    } else {
-                        pickFromGallery();
-                    }
-                } else {
-                    Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
+                    checkOK[i] = true;
                 }
+            }
+
+            if(checkOK[0] && mWhich==0){
+                pickFromCamera();
+            } else {
+                Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
+            }
+
+            if (checkOK[1] && mWhich==1){
+                pickFromGallery();
+            } else {
+                Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
             }
         }
     } // 권한에 대한 응답이 있을때 작동하는 함수
@@ -253,15 +259,14 @@ public class AddActivity extends AppCompatActivity {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mWhich = which;
                 switch (which){
                     case 0:
-                        mWhich = 0;
                         if(checkPermission()){
                             pickFromCamera();
                         }
                         break;
                     case 1:
-                        mWhich = 1;
                         if(checkPermission()){
                             pickFromGallery();
                         }
