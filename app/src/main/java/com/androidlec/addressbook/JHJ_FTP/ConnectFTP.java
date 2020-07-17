@@ -1,9 +1,9 @@
-package com.androidlec.addressbook.FTP_JHJ;
+package com.androidlec.addressbook.JHJ_FTP;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -14,16 +14,16 @@ import java.util.Date;
 
 public class ConnectFTP extends AsyncTask<Integer, String, String> {
 
-    public FTPClient mFTPClient = null;
+    private FTPClient mFTPClient;
 
-    Context context;
-    String host;
-    String username;
-    String password;
-    int port;
-    Uri file;
+    private Context context;
+    private String host;
+    private String username;
+    private String password;
+    private int port;
+    private Uri file;
 
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     public ConnectFTP(Context context, String host, String username, String password, int port, Uri file) {
         this.context = context;
@@ -69,19 +69,17 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
             formatDate = sdfNow.format(date);
 
             // 파일 업로드시
-            if (ftpUploadFile(file, formatDate+".jpg", currentPath)) {
-                Log.v("Chance", "Success");
-            }
+            ftpUploadFile(file, formatDate + ".jpg", currentPath);
         }
 
         if (status) {
             ftpDisconnect();
         }
 
-        return formatDate+".jpg";
+        return formatDate + ".jpg";
     }
 
-    public boolean ftpConnect(String host, String username, String password, int port) {
+    private boolean ftpConnect(String host, String username, String password, int port) {
         boolean result = false;
 
         try {
@@ -97,7 +95,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
         return result;
     }
 
-    public boolean ftpDisconnect() {
+    private boolean ftpDisconnect() {
         boolean result = false;
 
         try {
@@ -110,7 +108,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
         return result;
     }
 
-    public String ftpGetDirectory() {
+    private String ftpGetDirectory() {
         String directory = null;
         try {
             directory = mFTPClient.printWorkingDirectory();
@@ -120,7 +118,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
         return directory;
     }
 
-    public boolean ftpChangeDirectory(String directory) {
+    private boolean ftpChangeDirectory(String directory) {
         try {
             mFTPClient.changeWorkingDirectory(directory);
             return true;
@@ -131,7 +129,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
     }
 
     //                                     저장할 파일 이름        저장할 FTP 폴더 경
-    public boolean ftpUploadFile(Uri file, String desFileName, String desDriectroy) {
+    private boolean ftpUploadFile(Uri file, String desFileName, String desDriectroy) {
         boolean result = false;
         try {
             InputStream fis = context.getContentResolver().openInputStream(file);

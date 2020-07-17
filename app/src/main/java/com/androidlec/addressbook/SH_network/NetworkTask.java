@@ -1,11 +1,10 @@
-package com.androidlec.addressbook.network_sh;
+package com.androidlec.addressbook.SH_network;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.androidlec.addressbook.dto_sh.Address;
+import com.androidlec.addressbook.SH_dto.Address;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,17 +19,15 @@ import java.util.ArrayList;
 
 public class NetworkTask extends AsyncTask<Integer, String, Object> {
 
-    Context context;
-    String mAddr;
-    ProgressDialog progressDialog;
-    ArrayList<Address> addlist;
+    private Context context;
+    private String mAddr;
+    private ProgressDialog progressDialog;
+    private ArrayList<Address> addlist;
 
     public NetworkTask(Context context, String mAddr) {
         this.context = context;
         this.mAddr = mAddr;
-        this.addlist = new ArrayList<Address>();
-        //log.v("status", mAddr);
-        //log.v("status", "NetworkTask start");
+        this.addlist = new ArrayList<>();
     }
 
     @Override
@@ -40,7 +37,6 @@ public class NetworkTask extends AsyncTask<Integer, String, Object> {
         progressDialog.setTitle("Dialog");
         progressDialog.setMessage("Get......");
         progressDialog.show();
-
     }
 
     @Override
@@ -61,19 +57,17 @@ public class NetworkTask extends AsyncTask<Integer, String, Object> {
 
     @Override
     protected Object doInBackground(Integer... integers) {
-
         StringBuffer stringBuffer = new StringBuffer();
         InputStream inputStream = null;
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
-        //log.v("status", "doinBackground start");
 
         try {
             URL url = new URL(mAddr);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setConnectTimeout(10000);
 
-            if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 inputStream = httpURLConnection.getInputStream();
                 inputStreamReader = new InputStreamReader(inputStream);
                 // 잇풋 스트림으로 가져온 것을 인풋스트림 리더로 가져온다.
@@ -82,23 +76,18 @@ public class NetworkTask extends AsyncTask<Integer, String, Object> {
 
                 while (true) {
                     String strline = bufferedReader.readLine();
-                    if(strline == null) break;
+                    if (strline == null) break;
                     stringBuffer.append(strline + "\n");
                 }
-
                 Parser(stringBuffer.toString());
-
-            } else {
-
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if(bufferedReader != null) bufferedReader.close();
-                if(inputStreamReader != null) inputStreamReader.close();
-                if(inputStream != null) inputStream.close();
+                if (bufferedReader != null) bufferedReader.close();
+                if (inputStreamReader != null) inputStreamReader.close();
+                if (inputStream != null) inputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -110,9 +99,8 @@ public class NetworkTask extends AsyncTask<Integer, String, Object> {
         try {
             JSONObject jsonObject = new JSONObject(s);
             JSONArray jsonArray = new JSONArray(jsonObject.getString("address_info"));
-            //students_info 에 속해있는 Array를 가져와라.
 
-            for(int i = 0 ; i < jsonArray.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject1 = (JSONObject) jsonArray.get(i);
                 int aseqno = Integer.parseInt(jsonObject1.getString("aSeqno"));
                 String aname = jsonObject1.getString("aName");
@@ -133,11 +121,6 @@ public class NetworkTask extends AsyncTask<Integer, String, Object> {
 
 
     }
-
-
-
-
-
 
 
 }

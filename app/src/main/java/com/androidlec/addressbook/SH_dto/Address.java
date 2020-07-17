@@ -1,10 +1,9 @@
-package com.androidlec.addressbook.dto_sh;
+package com.androidlec.addressbook.SH_dto;
 
 public class Address {
 
-
-    int aseqno;
-    String aname, aphone, aemail, atag, aimage, amemo;
+    private int aseqno;
+    private String aname, aphone, aemail, atag, aimage, amemo;
 
     public Address(int aseqno, String aname, String aimage, String aphone, String aemail, String amemo, String atag) {
         this.aseqno = aseqno;
@@ -67,6 +66,7 @@ public class Address {
     public String getAmemo() {
         return amemo;
     }
+
     public void setAmemo(String amemo) {
         this.amemo = amemo;
     }

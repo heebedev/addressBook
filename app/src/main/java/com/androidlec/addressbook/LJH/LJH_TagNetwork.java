@@ -1,14 +1,8 @@
-package com.androidlec.addressbook;
+package com.androidlec.addressbook.LJH;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
-
-import com.androidlec.addressbook.adapter_sh.AddressListAdapter;
-import com.androidlec.addressbook.dto_sh.Address;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,24 +12,27 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
-public class CSUpdateNetworkTask extends AsyncTask<Integer, String, Void> {
+public class LJH_TagNetwork extends AsyncTask<Integer, String, Object> {
 
-    Context context;
-    String mAddr;
-    ProgressDialog progressDialog;
-    Address result;
+    private Context context;
+    private String mAddr;
+    private ArrayList<String> tNames;
+    private ProgressDialog progressDialog;
 
-    public CSUpdateNetworkTask(Context context, String mAddr) {
+    public LJH_TagNetwork(Context context, String mAddr) {
         this.context = context;
         this.mAddr = mAddr;
+        this.tNames = new ArrayList<>();
     }
 
     @Override
     protected void onPreExecute() {
         progressDialog = new ProgressDialog(context);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setMessage("불러오는 중...");
+        progressDialog.setTitle("Dialog");
+        progressDialog.setMessage("Get...");
         progressDialog.show();
     }
 
@@ -45,23 +42,8 @@ public class CSUpdateNetworkTask extends AsyncTask<Integer, String, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-
-        UpdateActivity.et_name.setText(result.getAname());
-        UpdateActivity.et_phone.setText(result.getAphone());
-        UpdateActivity.et_email.setText(result.getAemail());
-        UpdateActivity.et_comment.setText(result.getAmemo());
-
-        String url = AddressListAdapter.baseurl + result.getAimage();
-
-        //이미지 보여주기
-        Glide.with(context)
-                .load(url)
-                .apply(new RequestOptions().circleCrop())
-                .placeholder(R.drawable.ic_outline_emptyimage)
-                .into(UpdateActivity.ivAddImage);
-
+    protected void onPostExecute(Object o) {
+        super.onPostExecute(o);
         progressDialog.dismiss();
     }
 
@@ -71,7 +53,7 @@ public class CSUpdateNetworkTask extends AsyncTask<Integer, String, Void> {
     }
 
     @Override
-    protected Void doInBackground(Integer... integers) {
+    protected Object doInBackground(Integer... integers) {
         StringBuffer stringBuffer = new StringBuffer();
         InputStream inputStream = null;
         InputStreamReader inputStreamReader = null;
@@ -94,39 +76,44 @@ public class CSUpdateNetworkTask extends AsyncTask<Integer, String, Void> {
                     stringBuffer.append(strline + "\n");
                 } // 와일문 끝나면 다 가져왔다~.
 
-                parser(stringBuffer.toString());
+                // 파싱.
+                parser(stringBuffer.toString()); // 아직 안만들었어요~~~ But, 파씽 하겠다~.
 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bufferedReader != null) bufferedReader.close();
+                if (inputStreamReader != null) inputStreamReader.close();
+                if (inputStream != null) inputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return tNames;
+    }
+
+
+    private void parser(String s) { // 스트링 하나만 가져오죠.
+
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            JSONArray jsonArray = new JSONArray(jsonObject.getString("tag")); // students_info 에 있는걸 가져와라.
+            tNames.clear(); // 깨끗하게.
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject1 = (JSONObject) jsonArray.get(i);
+                String tName = jsonObject1.getString("tName");
+
+                tNames.add(tName);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        return null;
     }
 
-    private void parser(String s) {
-        try {
-            JSONObject jsonObject = new JSONObject(s);
-            JSONArray jsonArray = new JSONArray(jsonObject.getString("address_info"));
 
-            JSONObject jsonObject1 = (JSONObject) jsonArray.get(0);
-            int aseqno = Integer.parseInt(jsonObject1.getString("aSeqno"));
-            String aname = jsonObject1.getString("aName");
-            String aimage = jsonObject1.getString("aImage");
-            String aphone = jsonObject1.getString("aPNum");
-            String aemail = jsonObject1.getString("aEmail");
-            String amemo = jsonObject1.getString("aMemo");
-            String atag = jsonObject1.getString("aTag");
-
-            result = new Address(aseqno, aname, aimage, aphone, aemail, amemo, atag);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-}
+}//----

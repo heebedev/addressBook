@@ -1,0 +1,377 @@
+package com.androidlec.addressbook.Activity;
+
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.androidlec.addressbook.CS.CSNetworkTask;
+import com.androidlec.addressbook.CS.CSUpdateNetworkTask;
+import com.androidlec.addressbook.JHJ_FTP.ConnectFTP;
+import com.androidlec.addressbook.R;
+import com.androidlec.addressbook.SH_dto.Address;
+import com.androidlec.addressbook.StaticData;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+
+public class UpdateActivity extends AppCompatActivity {
+
+    // xml
+    private TextView tvbtregister, tvbtcancle;
+    private ImageView ivAddImage;
+    private TextInputEditText et_name, et_phone, et_email, et_comment;
+
+    // 스피너
+    private String[] spinnerReNames;
+    private TypedArray spinnerImages;
+
+    // 카메라, 이미지
+    private static final int PERMISSION_REQUST_CODE = 100;
+    private static final int IMAGE_PICK_CAMERA_CODE = 101;
+    private static final int IMAGE_PICK_GALLERY_CODE = 102;
+    private Uri image_uri;
+    private int mWhich;
+
+    // 태그
+    private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
+    private ArrayList<String> tagList;
+    private int tagClick = 0;
+
+    // 가져온 시퀀스 번호
+    private String seq;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_update);
+
+        // 키보드 화면 가림막기
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        init();
+
+        tvbtregister.setOnClickListener(onClickListener);
+        tvbtcancle.setOnClickListener(onClickListener);
+        ivAddImage.setOnClickListener(onClickListener);
+
+        Intent intent = getIntent();
+        seq = String.valueOf(intent.getIntExtra("seq", 0));
+
+        getData(seq);
+
+    } // onCreate
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //권한을 허용 했을 경우
+        if (requestCode == PERMISSION_REQUST_CODE) {
+            int length = permissions.length;
+            for (int i = 0; i < length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    // 동의
+                    if (mWhich == 0) {
+                        pickFromCamera();
+                    } else {
+                        pickFromGallery();
+                    }
+                } else {
+                    Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    } // 권한에 대한 응답이 있을때 작동하는 함수
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == IMAGE_PICK_GALLERY_CODE) {
+                assert data != null;
+                image_uri = data.getData();
+            }
+
+            Glide.with(this)
+                    .load(image_uri.toString())
+                    .apply(new RequestOptions().circleCrop())
+                    .placeholder(R.drawable.ic_outline_emptyimage)
+                    .error(R.drawable.ic_tag_orange_checked)
+                    .into(ivAddImage);
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    } // 카메라, 저장소에서 이미지 선택 후 이미지 보이기
+
+    private void init() {
+        tvbtregister = findViewById(R.id.tvbt_addAddress_update);
+        tvbtcancle = findViewById(R.id.tvbt_addAddress_cancel);
+        ivAddImage = findViewById(R.id.iv_addAddress_image);
+        et_name = findViewById(R.id.et_addAddress_name);
+        et_phone = findViewById(R.id.et_addAddress_phone);
+        et_email = findViewById(R.id.et_addAddress_email);
+        et_comment = findViewById(R.id.et_addAddress_cmt);
+
+        Resources res = getResources();
+        spinnerReNames = MainActivity.spinnerNames;
+        spinnerImages = res.obtainTypedArray(R.array.tag_array);
+        spinnerReNames[0] = "태그 없음";
+
+        for (int i = 0; i < iv_tags.length; i++) {
+            final int finalI = i;
+            findViewById(iv_tags[i]).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.isSelected()) {
+                        v.setSelected(false);
+                        tagClick--;
+                    } else {
+                        if (tagClick < 3) {
+                            int pos = finalI + 1;
+                            v.setSelected(true);
+                            Toast.makeText(UpdateActivity.this, spinnerReNames[pos], Toast.LENGTH_SHORT).show();
+                            tagClick++;
+                        } else {
+                            Toast.makeText(UpdateActivity.this, "선택은 3개만 가능합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                }
+            });
+        }
+    } // 초기화
+
+    public boolean checkPermission() {
+        String temp = "";
+        //카메라 권한 확인
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            temp += Manifest.permission.CAMERA + " ";
+        }
+        //파일 읽기 권한 확인
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            temp += Manifest.permission.READ_EXTERNAL_STORAGE + " ";
+        }
+        //파일 쓰기 권한 확인
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            temp += Manifest.permission.WRITE_EXTERNAL_STORAGE + " ";
+        }
+        if (!TextUtils.isEmpty(temp)) {
+            // 권한 요청 다이얼로그
+            ActivityCompat.requestPermissions(this, temp.trim().split(" "), PERMISSION_REQUST_CODE);
+        } else {
+            // 모두 허용 상태
+            return true;
+        }
+        return false;
+    } // 카메라, 저장소 권한확인
+
+    private void getData(String seq) {
+        String urlAddr = "http://192.168.0.79:8080/test/csGetAddressBook.jsp?";
+
+        urlAddr = urlAddr + "seq=" + seq;
+
+        try {
+            CSUpdateNetworkTask csNetworkTask = new CSUpdateNetworkTask(UpdateActivity.this, urlAddr);
+            Address address = csNetworkTask.execute().get(); // doInBackground 의 리턴값
+            inpuData(address);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } // 데이터 가져오기
+
+    private void inpuData(Address address) {
+
+        // 텍스트 보여주기
+        et_name.setText(address.getAname());
+        et_phone.setText(address.getAphone());
+        et_email.setText(address.getAemail());
+        et_comment.setText(address.getAmemo());
+
+        String url = StaticData.BASE_URL + address.getAimage();
+
+        //이미지 보여주기
+        Glide.with(UpdateActivity.this)
+                .load(url)
+                .apply(new RequestOptions().circleCrop())
+                .placeholder(R.drawable.ic_outline_emptyimage)
+                .into(ivAddImage);
+
+        // 태그 보여주기
+        String[] tag = address.getAtag().split(",");
+        for (String s : tag) {
+            int tagIndex = Integer.parseInt(s);
+            switch (tagIndex) {
+                case 0:
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    findViewById(iv_tags[tagIndex - 1]).setSelected(true);
+                    break;
+            }
+        }
+    } // 가져온 데이터 나타내기
+
+    private void updateData(String seq) {
+        String name = et_name.getText().toString().trim();
+        String phone = et_phone.getText().toString().trim();
+        String email = et_email.getText().toString().trim();
+        String comment = et_comment.getText().toString().trim();
+
+        if (tagSelectedOK()) {
+            String tagListString = tagList.toString();
+            tagListString = tagListString.substring(1, tagListString.length() - 1); // 앞뒤 [] 제거
+            tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
+
+            // 빈칸, 유효성 검사
+            if (TextUtils.isEmpty(name)) {
+                Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            } else if (TextUtils.isEmpty(phone)) {
+                Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            } else if (image_uri == null) {
+                updateToDB(name, phone, email, comment, "", tagListString, seq);
+            } else {
+                ConnectFTP mConnectFTP = new ConnectFTP(UpdateActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                String fileName = "";
+                try {
+                    fileName = mConnectFTP.execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                updateToDB(name, phone, email, comment, fileName, tagListString, seq);
+            }
+        }
+    } // 데이터 수정 액션
+
+    private boolean tagSelectedOK() {
+
+        tagList = new ArrayList<>();
+
+        for (int i = 0; i < iv_tags.length; i++) {
+            if (findViewById(iv_tags[i]).isSelected()) {
+                tagList.add(String.valueOf(i + 1));
+            }
+        }
+
+        if (tagList.size() == 0) {
+            tagList.add("0");
+            return true;
+        } else if (tagList.size() > 3) {
+            Toast.makeText(this, "태그는 최대 3만 선택 가능합니다.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    } // 태그 리스트
+
+    private void updateToDB(String name, String phone, String email, String comment, String fileName, String tags, String seq) {
+        String urlAddr = "http://192.168.0.79:8080/test/csUpdateAddressBook.jsp?";
+
+        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tags + "&seq=" + seq;
+
+        try {
+            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
+            csNetworkTask.execute().get(); // doInBackground 의 리턴값
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } // 데이터베이스에 데이터 수정
+
+//    private void updateToDB(String name, String phone, String email, String comment, String tags, String seq) {
+//        String urlAddr = "http://192.168.0.79:8080/test/csUpdate2AddressBook.jsp?";
+//
+//        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&tags=" + tags + "&seq=" + seq;
+//
+//        try {
+//            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
+//            csNetworkTask.execute().get(); // doInBackground 의 리턴값
+//            finish();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    private void showImagePicDialog() {
+        String[] options = {"카메라에서 촬영", "갤러리에서 선택"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(UpdateActivity.this);
+        builder.setTitle("이미지 등록");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (checkPermission()) {
+                    if (which == 0) {
+                        pickFromCamera();
+                        mWhich = 0;
+                    } else {
+                        pickFromGallery();
+                        mWhich = 1;
+                    }
+                }
+            }
+        });
+        builder.create().show();
+    } // 이미지 선택 다이얼로그
+
+    private void pickFromCamera() {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
+
+        image_uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
+        startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
+    } // 카메라에서 이미지선택
+
+    private void pickFromGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
+    } // 갤러리에서 이미지선택
+
+    TextView.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.iv_addAddress_image:
+                    showImagePicDialog();
+                    break;
+                case R.id.tvbt_addAddress_update:
+                    updateData(seq);
+                    break;
+                case R.id.tvbt_addAddress_cancel:
+                    finish();
+                    break;
+            }
+        }
+    };
+}

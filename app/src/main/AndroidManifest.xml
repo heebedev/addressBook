@@ -16,18 +16,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".UpdateActivity"></activity>
+        <activity android:name=".Activity.UpdateActivity"></activity>
         <activity
-            android:name=".TagOptionDialog"
+            android:name=".CS.TagOptionDialog"
             android:theme="@style/Dialog" />
-        <activity android:name=".AddActivity" />
+        <activity android:name=".Activity.AddActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activity.MainActivity"
             android:theme="@style/MainTheme" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".LJH_SettingActivity" />
-        <activity android:name=".SplashActivity">
+        <activity android:name=".Activity.RegisterActivity" />
+        <activity android:name=".Activity.LoginActivity" />
+        <activity android:name=".LJH.LJH_SettingActivity" />
+        <activity android:name=".Activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

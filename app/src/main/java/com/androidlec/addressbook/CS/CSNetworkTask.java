@@ -1,18 +1,17 @@
-package com.androidlec.addressbook;
+package com.androidlec.addressbook.CS;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class CSNetworkTask extends AsyncTask<Integer, String, Void> {
 
-    Context context;
-    String mAddr;
-    ProgressDialog progressDialog;
+    private Context context;
+    private String mAddr;
+    private ProgressDialog progressDialog;
 
     public CSNetworkTask(Context context, String mAddr) {
         this.context = context;
@@ -21,7 +20,6 @@ public class CSNetworkTask extends AsyncTask<Integer, String, Void> {
 
     @Override
     protected void onPreExecute() {
-        Log.e("Chance", "onPreExecute");
         progressDialog = new ProgressDialog(context);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setMessage("Please Wait...");
@@ -51,7 +49,7 @@ public class CSNetworkTask extends AsyncTask<Integer, String, Void> {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setConnectTimeout(10000);
 
-            if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             }
 
         } catch (Exception e) {

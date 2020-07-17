@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:gravity="center"
     android:background="#fff"
-    tools:context=".LoginActivity">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".Activity.LoginActivity">
 
     <!-- 이미지 로고 -->
     <TextView
@@ -15,36 +15,36 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
         android:text="비밀번호 변경"
+        android:textColor="@color/colorDanawa"
         android:textSize="40sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorDanawa" />
+        android:textStyle="bold" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="250dp"
         android:layout_height="wrap_content">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/setting_et_id"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="이메일"
-            android:inputType="textEmailAddress"
             android:enabled="false"
-            />
+            android:hint="이메일"
+            android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        app:passwordToggleEnabled="true"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="20dp"
+        app:passwordToggleEnabled="true">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/setting_et_password"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="새로운 비밀번호(6자이상)"
-            android:inputType="textPassword"
             android:focusable="true"
-            />
+            android:hint="새로운 비밀번호(6자이상)"
+            android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
