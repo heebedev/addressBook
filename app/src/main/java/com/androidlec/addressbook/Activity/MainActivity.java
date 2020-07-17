@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public static String[] spinnerNames;
     private ArrayList<String> tNames;
     public static TypedArray tagImages;
+    private int spinnerPosition;
 
     // 리스트뷰
     private ArrayList<Address> data;
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 키보드 화면 가림막기
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         // 초기화
         init();
@@ -157,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         centIP = "192.168.0.138";
     } // 초기화
 
-    public void Spinner_List() {
+    private void Spinner_List() {
         spinnerNames[0] = "전체보기";
 
         // 태그 불러오기.
@@ -170,8 +175,10 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + StaticData.USER_ID;
+                    spinnerPosition = 0;
                 } else {
                     urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid=" + StaticData.USER_ID + "&aTag=" + position;
+                    spinnerPosition = position;
                 }
                 connectGetData();
             }
@@ -252,7 +259,11 @@ public class MainActivity extends AppCompatActivity {
     SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query;
+            if (spinnerPosition == 0) {
+                urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query;
+            } else {
+                urlAddr = "http://192.168.0.79:8080/test/csAddress_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query + "&aTag=" + spinnerPosition;
+            }
             connectGetData();
             return false;
         }

@@ -4,11 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.androidlec.addressbook.Activity.AddActivity;
 import com.androidlec.addressbook.Activity.UpdateActivity;
-import com.androidlec.addressbook.StaticData;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
