@@ -20,13 +20,12 @@ public class LJH_LoginNetworkTask extends AsyncTask<Integer, String, Integer> {
     public LJH_LoginNetworkTask(Context context, String mAddr) {
         this.context = context;
         this.mAddr = mAddr;
-        this.loginChk = loginChk;
     }
 
     @Override
     protected void onPreExecute() {
         progressDialog = new ProgressDialog(context);
-        progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setTitle("Dialog");
         progressDialog.setMessage("Please wait a moment..");
         progressDialog.show();

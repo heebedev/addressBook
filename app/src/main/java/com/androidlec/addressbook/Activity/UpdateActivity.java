@@ -1,6 +1,5 @@
 package com.androidlec.addressbook.Activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -23,11 +22,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.androidlec.addressbook.CS.CSNetworkTask;
 import com.androidlec.addressbook.CS.CSUpdateNetworkTask;
+import com.androidlec.addressbook.CS.Permission;
 import com.androidlec.addressbook.JHJ_FTP.UpdateConnectFTP;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.SH_dto.Address;
@@ -51,11 +49,10 @@ public class UpdateActivity extends AppCompatActivity {
     private TypedArray spinnerImages;
 
     // 카메라, 이미지
-    private static final int PERMISSION_REQUST_CODE = 100;
     private static final int IMAGE_PICK_CAMERA_CODE = 101;
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
     private Uri image_uri;
-    private int mWhich;
+    private Permission permission;
 
     // 태그
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
@@ -85,40 +82,44 @@ public class UpdateActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //권한을 허용 했을 경우
-        if (requestCode == PERMISSION_REQUST_CODE) {
-            int length = permissions.length;
-            for (int i = 0; i < length; i++) {
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    // 동의
-                    if (mWhich == 0) {
+        switch (requestCode) {
+            case Permission.CAMERA_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (cameraAccepted) {
                         pickFromCamera();
                     } else {
-                        pickFromGallery();
+                        Toast.makeText(UpdateActivity.this, "카메라 권한을 동의해주세요.", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
                 }
             }
+            break;
+            case Permission.STORAGE_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (writeStorageAccepted) {
+                        pickFromGallery();
+                    } else {
+                        Toast.makeText(UpdateActivity.this, "저장공간 권한을 동의해주세요.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+            break;
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     } // 권한에 대한 응답이 있을때 작동하는 함수
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == IMAGE_PICK_GALLERY_CODE) {
-                assert data != null;
-                image_uri = data.getData();
+            switch (requestCode) {
+                case IMAGE_PICK_GALLERY_CODE:
+                    image_uri = data.getData();
+                case IMAGE_PICK_CAMERA_CODE:
+                    uploadProfileCoverPhoto(image_uri);
+                    break;
             }
-
-            Glide.with(this)
-                    .load(image_uri.toString())
-                    .apply(new RequestOptions().circleCrop())
-                    .placeholder(R.drawable.ic_outline_emptyimage)
-                    .error(R.drawable.ic_tag_orange_checked)
-                    .into(ivAddImage);
         }
-
         super.onActivityResult(requestCode, resultCode, data);
     } // 카메라, 저장소에서 이미지 선택 후 이미지 보이기
 
@@ -130,6 +131,8 @@ public class UpdateActivity extends AppCompatActivity {
         et_phone = findViewById(R.id.et_addAddress_phone);
         et_email = findViewById(R.id.et_addAddress_email);
         et_comment = findViewById(R.id.et_addAddress_cmt);
+
+        permission = new Permission(this);
 
         Resources res = getResources();
         spinnerReNames = MainActivity.spinnerNames;
@@ -160,29 +163,13 @@ public class UpdateActivity extends AppCompatActivity {
         }
     } // 초기화
 
-    public boolean checkPermission() {
-        String temp = "";
-        //카메라 권한 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            temp += Manifest.permission.CAMERA + " ";
-        }
-        //파일 읽기 권한 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            temp += Manifest.permission.READ_EXTERNAL_STORAGE + " ";
-        }
-        //파일 쓰기 권한 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            temp += Manifest.permission.WRITE_EXTERNAL_STORAGE + " ";
-        }
-        if (!TextUtils.isEmpty(temp)) {
-            // 권한 요청 다이얼로그
-            ActivityCompat.requestPermissions(this, temp.trim().split(" "), PERMISSION_REQUST_CODE);
-        } else {
-            // 모두 허용 상태
-            return true;
-        }
-        return false;
-    } // 카메라, 저장소 권한확인
+    private void uploadProfileCoverPhoto(Uri uri) {
+        Glide.with(this)
+                .load(uri)
+                .apply(new RequestOptions().circleCrop())
+                .placeholder(R.drawable.ic_outline_emptyimage)
+                .into(ivAddImage);
+    } // 이미지 보이기
 
     private void getData(String seq) {
         String urlAddr = "http://192.168.0.79:8080/test/csGetAddressBook.jsp?";
@@ -235,7 +222,7 @@ public class UpdateActivity extends AppCompatActivity {
         }
     } // 가져온 데이터 나타내기
 
-    private void updateData(String seq) {
+    private void updateData() {
         name = et_name.getText().toString().trim();
         phone = et_phone.getText().toString().trim();
         email = et_email.getText().toString().trim();
@@ -321,13 +308,17 @@ public class UpdateActivity extends AppCompatActivity {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (checkPermission()) {
-                    if (which == 0) {
+                if (which == 0) {
+                    if (!permission.checkCameraPermission()) {
+                        permission.requestCameraPermission();
+                    } else {
                         pickFromCamera();
-                        mWhich = 0;
+                    }
+                } else if (which == 1) {
+                    if (!permission.checkStoragePermission()) {
+                        permission.requestStoragePermission();
                     } else {
                         pickFromGallery();
-                        mWhich = 1;
                     }
                 }
             }
@@ -361,7 +352,7 @@ public class UpdateActivity extends AppCompatActivity {
                     showImagePicDialog();
                     break;
                 case R.id.tvbt_addAddress_update:
-                    updateData(seq);
+                    updateData();
                     break;
                 case R.id.tvbt_addAddress_cancel:
                     finish();

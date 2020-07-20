@@ -1,21 +1,14 @@
 package com.androidlec.addressbook.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -26,7 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.androidlec.addressbook.CS.CSNetworkTask;
+import com.androidlec.addressbook.CS.Permission;
 import com.androidlec.addressbook.JHJ_FTP.AddConnectFTP;
 import com.androidlec.addressbook.R;
 import com.androidlec.addressbook.StaticData;
@@ -40,7 +38,7 @@ public class AddActivity extends AppCompatActivity {
 
     private static String name, phone, email, comment, tagListString;
     // xml
-    private TextView tv_bt_register, tv_bt_cancle;
+    private TextView tv_bt_register, tv_bt_cancel;
     private ImageView ivAddImage;
     private TextInputEditText et_name, et_phone, et_email, et_comment;
 
@@ -49,15 +47,14 @@ public class AddActivity extends AppCompatActivity {
     private TypedArray spinnerImages;
 
     // 카메라, 이미지
-    private static final int PERMISSION_REQUST_CODE = 100;
     private static final int IMAGE_PICK_CAMERA_CODE = 101;
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
     private Uri image_uri;
-    private int mWhich;
+    private Permission permission;
 
     // 태그
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
-    private  ArrayList<String> tagList;
+    private ArrayList<String> tagList;
     private int tagClick = 0;
 
     @Override
@@ -73,63 +70,64 @@ public class AddActivity extends AppCompatActivity {
 
         // 클릭 리스너
         tv_bt_register.setOnClickListener(onClickListener);
-        tv_bt_cancle.setOnClickListener(onClickListener);
+        tv_bt_cancel.setOnClickListener(onClickListener);
         ivAddImage.setOnClickListener(onClickListener);
 
     } // onCreate
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //권한을 허용 했을 경우
-        boolean[] checkOK = {false, false, false};
-        if (requestCode == PERMISSION_REQUST_CODE) {
-            int length = permissions.length;
-            for (int i = 0; i < length; i++) {
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    checkOK[i] = true;
+        switch (requestCode) {
+            case Permission.CAMERA_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (cameraAccepted) {
+                        pickFromCamera();
+                    } else {
+                        Toast.makeText(AddActivity.this, "카메라 권한을 동의해주세요.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
-
-            if(checkOK[0] && mWhich==0){
-                pickFromCamera();
-            } else {
-                Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
+            break;
+            case Permission.STORAGE_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (writeStorageAccepted) {
+                        pickFromGallery();
+                    } else {
+                        Toast.makeText(AddActivity.this, "저장공간 권한을 동의해주세요.", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
-
-            if (checkOK[1] && mWhich==1){
-                pickFromGallery();
-            } else {
-                Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
-            }
+            break;
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     } // 권한에 대한 응답이 있을때 작동하는 함수
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == IMAGE_PICK_GALLERY_CODE) {
-                assert data != null;
-                image_uri = data.getData();
+            switch (requestCode) {
+                case IMAGE_PICK_GALLERY_CODE:
+                    image_uri = data.getData();
+                case IMAGE_PICK_CAMERA_CODE:
+                    uploadProfileCoverPhoto(image_uri);
+                    break;
             }
-
-            Glide.with(this)
-                    .load(image_uri.toString())
-                    .apply(new RequestOptions().circleCrop())
-                    .placeholder(R.drawable.ic_outline_emptyimage)
-                    .into(ivAddImage);
         }
-
         super.onActivityResult(requestCode, resultCode, data);
-    } // 카메라, 저장소에서 이미지 선택 후 이미지 보이기
+    } // 카메라, 저장소에서 이미지 선택 후 이미지 주소얻기
 
     private void init() {
         tv_bt_register = findViewById(R.id.tvbt_addAddress_update);
-        tv_bt_cancle = findViewById(R.id.tvbt_addAddress_cancel);
+        tv_bt_cancel = findViewById(R.id.tvbt_addAddress_cancel);
         ivAddImage = findViewById(R.id.iv_addAddress_image);
         et_name = findViewById(R.id.et_addAddress_name);
         et_phone = findViewById(R.id.et_addAddress_phone);
         et_email = findViewById(R.id.et_addAddress_email);
         et_comment = findViewById(R.id.et_addAddress_cmt);
+
+        permission = new Permission(this);
 
         Resources res = getResources();
         spinnerReNames = MainActivity.spinnerNames;
@@ -142,7 +140,7 @@ public class AddActivity extends AppCompatActivity {
             findViewById(iv_tags[i]).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(v.isSelected()){
+                    if (v.isSelected()) {
                         v.setSelected(false);
                         tagClick--;
                     } else {
@@ -162,29 +160,13 @@ public class AddActivity extends AppCompatActivity {
 
     } // 초기화
 
-    private boolean checkPermission() {
-        String temp = "";
-        //카메라 권한 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            temp += Manifest.permission.CAMERA + " ";
-        }
-        //파일 읽기 권한 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            temp += Manifest.permission.READ_EXTERNAL_STORAGE + " ";
-        }
-        //파일 쓰기 권한 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            temp += Manifest.permission.WRITE_EXTERNAL_STORAGE + " ";
-        }
-        if (!TextUtils.isEmpty(temp)) {
-            // 권한 요청 다이얼로그
-            ActivityCompat.requestPermissions(this, temp.trim().split(" "),PERMISSION_REQUST_CODE);
-        } else {
-            // 모두 허용 상태
-            return true;
-        }
-        return false;
-    } // 카메라, 저장소 권한확인
+    private void uploadProfileCoverPhoto(Uri uri) {
+        Glide.with(this)
+                .load(uri)
+                .apply(new RequestOptions().circleCrop())
+                .placeholder(R.drawable.ic_outline_emptyimage)
+                .into(ivAddImage);
+    } // 이미지 보이기
 
     private void inputNewData() {
         name = et_name.getText().toString().trim();
@@ -192,23 +174,23 @@ public class AddActivity extends AppCompatActivity {
         email = et_email.getText().toString().trim();
         comment = et_comment.getText().toString().trim();
 
-        if(tagSelectedOK()){
+        if (tagSelectedOK()) {
             tagListString = tagList.toString();
-            tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
+            tagListString = tagListString.substring(1, tagListString.length() - 1); // 앞뒤 [] 제거
             tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
 
             // 빈칸, 유효성 검사
-            if(TextUtils.isEmpty(name)){
+            if (TextUtils.isEmpty(name)) {
                 Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            } else if(TextUtils.isEmpty(phone)){
+            } else if (TextUtils.isEmpty(phone)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            } else if(image_uri == null){
+            } else if (image_uri == null) {
                 uploadToDB(AddActivity.this, "");
             } else {
                 try {
                     AddConnectFTP addConnectFTP = new AddConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                     addConnectFTP.execute();
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -219,16 +201,16 @@ public class AddActivity extends AppCompatActivity {
         tagList = new ArrayList<>();
 
         for (int i = 0; i < iv_tags.length; i++) {
-            if (findViewById(iv_tags[i]).isSelected()){
+            if (findViewById(iv_tags[i]).isSelected()) {
                 int pos = i + 1;
-                tagList.add(String.valueOf(i+1));
+                tagList.add(String.valueOf(i + 1));
             }
         }
 
-        if (tagList.size() == 0){
+        if (tagList.size() == 0) {
             tagList.add("0");
             return true;
-        } else if(tagList.size() > 3){
+        } else if (tagList.size() > 3) {
             Toast.makeText(this, "태그는 최대 3만 선택 가능합니다.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -259,18 +241,18 @@ public class AddActivity extends AppCompatActivity {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mWhich = which;
-                switch (which){
-                    case 0:
-                        if(checkPermission()){
-                            pickFromCamera();
-                        }
-                        break;
-                    case 1:
-                        if(checkPermission()){
-                            pickFromGallery();
-                        }
-                        break;
+                if (which == 0) {
+                    if (!permission.checkCameraPermission()) {
+                        permission.requestCameraPermission();
+                    } else {
+                        pickFromCamera();
+                    }
+                } else if (which == 1) {
+                    if (!permission.checkStoragePermission()) {
+                        permission.requestStoragePermission();
+                    } else {
+                        pickFromGallery();
+                    }
                 }
             }
         });
@@ -305,7 +287,7 @@ public class AddActivity extends AppCompatActivity {
                 case R.id.tvbt_addAddress_update:
                     inputNewData();
                     break;
-                case R.id.tvbt_addAddress_cancel :
+                case R.id.tvbt_addAddress_cancel:
                     finish();
                     break;
             }
