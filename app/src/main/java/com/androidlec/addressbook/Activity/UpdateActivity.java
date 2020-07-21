@@ -115,7 +115,6 @@ public class UpdateActivity extends AppCompatActivity {
                     .load(image_uri.toString())
                     .apply(new RequestOptions().circleCrop())
                     .placeholder(R.drawable.ic_outline_emptyimage)
-                    .error(R.drawable.ic_tag_orange_checked)
                     .into(ivAddImage);
         }
 
@@ -298,20 +297,6 @@ public class UpdateActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     } // 데이터베이스에 데이터 수정
-
-//    private void updateToDB(String name, String phone, String email, String comment, String tags, String seq) {
-//        String urlAddr = "http://192.168.0.79:8080/test/csUpdate2AddressBook.jsp?";
-//
-//        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&tags=" + tags + "&seq=" + seq;
-//
-//        try {
-//            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
-//            csNetworkTask.execute().get(); // doInBackground 의 리턴값
-//            finish();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void showImagePicDialog() {
         String[] options = {"카메라에서 촬영", "갤러리에서 선택"};

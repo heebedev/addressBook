@@ -1,21 +1,15 @@
 package com.androidlec.addressbook.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,6 +19,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.androidlec.addressbook.CS.CSNetworkTask;
 import com.androidlec.addressbook.JHJ_FTP.AddConnectFTP;
@@ -57,7 +57,7 @@ public class AddActivity extends AppCompatActivity {
 
     // 태그
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
-    private  ArrayList<String> tagList;
+    private ArrayList<String> tagList;
     private int tagClick = 0;
 
     @Override
@@ -90,13 +90,13 @@ public class AddActivity extends AppCompatActivity {
                 }
             }
 
-            if(checkOK[0] && mWhich==0){
+            if (checkOK[0] && mWhich == 0) {
                 pickFromCamera();
             } else {
                 Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
             }
 
-            if (checkOK[1] && mWhich==1){
+            if (checkOK[1] && mWhich == 1) {
                 pickFromGallery();
             } else {
                 Toast.makeText(this, "권한 요청을 동의해 주세요.", Toast.LENGTH_SHORT).show();
@@ -142,7 +142,7 @@ public class AddActivity extends AppCompatActivity {
             findViewById(iv_tags[i]).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(v.isSelected()){
+                    if (v.isSelected()) {
                         v.setSelected(false);
                         tagClick--;
                     } else {
@@ -178,7 +178,7 @@ public class AddActivity extends AppCompatActivity {
         }
         if (!TextUtils.isEmpty(temp)) {
             // 권한 요청 다이얼로그
-            ActivityCompat.requestPermissions(this, temp.trim().split(" "),PERMISSION_REQUST_CODE);
+            ActivityCompat.requestPermissions(this, temp.trim().split(" "), PERMISSION_REQUST_CODE);
         } else {
             // 모두 허용 상태
             return true;
@@ -192,23 +192,23 @@ public class AddActivity extends AppCompatActivity {
         email = et_email.getText().toString().trim();
         comment = et_comment.getText().toString().trim();
 
-        if(tagSelectedOK()){
+        if (tagSelectedOK()) {
             tagListString = tagList.toString();
-            tagListString = tagListString.substring(1, tagListString.length()-1); // 앞뒤 [] 제거
+            tagListString = tagListString.substring(1, tagListString.length() - 1); // 앞뒤 [] 제거
             tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
 
             // 빈칸, 유효성 검사
-            if(TextUtils.isEmpty(name)){
+            if (TextUtils.isEmpty(name)) {
                 Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            } else if(TextUtils.isEmpty(phone)){
+            } else if (TextUtils.isEmpty(phone)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            } else if(image_uri == null){
+            } else if (image_uri == null) {
                 uploadToDB(AddActivity.this, "");
             } else {
                 try {
                     AddConnectFTP addConnectFTP = new AddConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
                     addConnectFTP.execute();
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -219,16 +219,16 @@ public class AddActivity extends AppCompatActivity {
         tagList = new ArrayList<>();
 
         for (int i = 0; i < iv_tags.length; i++) {
-            if (findViewById(iv_tags[i]).isSelected()){
+            if (findViewById(iv_tags[i]).isSelected()) {
                 int pos = i + 1;
-                tagList.add(String.valueOf(i+1));
+                tagList.add(String.valueOf(i + 1));
             }
         }
 
-        if (tagList.size() == 0){
+        if (tagList.size() == 0) {
             tagList.add("0");
             return true;
-        } else if(tagList.size() > 3){
+        } else if (tagList.size() > 3) {
             Toast.makeText(this, "태그는 최대 3만 선택 가능합니다.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -260,14 +260,14 @@ public class AddActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mWhich = which;
-                switch (which){
+                switch (which) {
                     case 0:
-                        if(checkPermission()){
+                        if (checkPermission()) {
                             pickFromCamera();
                         }
                         break;
                     case 1:
-                        if(checkPermission()){
+                        if (checkPermission()) {
                             pickFromGallery();
                         }
                         break;
@@ -305,7 +305,7 @@ public class AddActivity extends AppCompatActivity {
                 case R.id.tvbt_addAddress_update:
                     inputNewData();
                     break;
-                case R.id.tvbt_addAddress_cancel :
+                case R.id.tvbt_addAddress_cancel:
                     finish();
                     break;
             }
