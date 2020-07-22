@@ -53,6 +53,7 @@ public class UpdateActivity extends AppCompatActivity {
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
     private Uri image_uri;
     private Permission permission;
+    private String mImageUrl = "";
 
     // 태그
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
@@ -119,6 +120,12 @@ public class UpdateActivity extends AppCompatActivity {
                     uploadProfileCoverPhoto(image_uri);
                     break;
             }
+
+            Glide.with(this)
+                    .load(image_uri.toString())
+                    .apply(new RequestOptions().circleCrop())
+                    .placeholder(R.drawable.ic_outline_emptyimage)
+                    .into(ivAddImage);
         }
         super.onActivityResult(requestCode, resultCode, data);
     } // 카메라, 저장소에서 이미지 선택 후 이미지 보이기
@@ -179,13 +186,13 @@ public class UpdateActivity extends AppCompatActivity {
         try {
             CSUpdateNetworkTask csNetworkTask = new CSUpdateNetworkTask(UpdateActivity.this, urlAddr);
             Address address = csNetworkTask.execute().get(); // doInBackground 의 리턴값
-            inpuData(address);
+            inputData(address);
         } catch (Exception e) {
             e.printStackTrace();
         }
     } // 데이터 가져오기
 
-    private void inpuData(Address address) {
+    private void inputData(Address address) {
 
         // 텍스트 보여주기
         et_name.setText(address.getAname());
@@ -194,6 +201,7 @@ public class UpdateActivity extends AppCompatActivity {
         et_comment.setText(address.getAmemo());
 
         String url = StaticData.BASE_URL + address.getAimage();
+        mImageUrl = address.getAimage();
 
         //이미지 보여주기
         Glide.with(UpdateActivity.this)
@@ -239,7 +247,7 @@ public class UpdateActivity extends AppCompatActivity {
             } else if (TextUtils.isEmpty(phone)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if (image_uri == null) {
-                updateToDB(UpdateActivity.this, "");
+                updateToDB(UpdateActivity.this, mImageUrl);
             } else {
                 try {
                     UpdateConnectFTP updateConnectFTP = new UpdateConnectFTP(UpdateActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
@@ -285,20 +293,6 @@ public class UpdateActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     } // 데이터베이스에 데이터 수정
-
-//    private void updateToDB(String name, String phone, String email, String comment, String tags, String seq) {
-//        String urlAddr = "http://192.168.0.79:8080/test/csUpdate2AddressBook.jsp?";
-//
-//        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&tags=" + tags + "&seq=" + seq;
-//
-//        try {
-//            CSNetworkTask csNetworkTask = new CSNetworkTask(UpdateActivity.this, urlAddr);
-//            csNetworkTask.execute().get(); // doInBackground 의 리턴값
-//            finish();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void showImagePicDialog() {
         String[] options = {"카메라에서 촬영", "갤러리에서 선택"};

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.androidlec.addressbook.Activity.LoginActivity;
 import com.androidlec.addressbook.Activity.MainActivity;
 import com.androidlec.addressbook.Activity.RegisterActivity;
 import com.androidlec.addressbook.R;
@@ -118,7 +119,7 @@ public class LJH_SettingActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     removeAutoLogin();
                                     deleteId();
-                                    startActivity(new Intent(LJH_SettingActivity.this, RegisterActivity.class));
+                                    startActivity(new Intent(LJH_SettingActivity.this, LoginActivity.class));
                                     Toast.makeText(LJH_SettingActivity.this, "그동안 이용해주셔서 감사합니다.", Toast.LENGTH_LONG).show();
                                     finish();
                                 }

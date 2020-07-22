@@ -74,12 +74,12 @@ public class AddressListAdapter extends BaseAdapter {
 
         tvname.setText(data.get(position).getAname());
         tvphone.setText(data.get(position).getAphone());
-        if(data.get(position).getAemail().length() == 0){
+        if (data.get(position).getAemail().length() == 0) {
             tvemail.setText("-");
         } else {
             tvemail.setText(data.get(position).getAemail());
         }
-        if(data.get(position).getAmemo().length() == 0){
+        if (data.get(position).getAmemo().length() == 0) {
             tvcmt.setText("-");
         } else {
             tvcmt.setText(data.get(position).getAmemo());
@@ -123,5 +123,4 @@ public class AddressListAdapter extends BaseAdapter {
 
         return convertView;
     }
-
 }
