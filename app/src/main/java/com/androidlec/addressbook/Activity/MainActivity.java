@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Address> data;
     private AddressListAdapter adapter;
     private ListView listView;
+    private TextView tv_listFooter;
 
     // datajsp
     private String centIP, urlAddr;
@@ -147,11 +148,17 @@ public class MainActivity extends AppCompatActivity {
     } // 뒤로가기
 
     private void init() {
+        // xml 초기화
         spinner_tags = findViewById(R.id.main_sp_taglist);
         listView = findViewById(R.id.main_lv_addresslist);
         fladdBtn = findViewById(R.id.main_fab_add);
         tv_noList = findViewById(R.id.main_tv_noList);
 
+        // listView에 footer 추가.
+        listView.addFooterView(getLayoutInflater().inflate(R.layout.address_list_footer, null, false));
+        tv_listFooter = findViewById(R.id.listView_footer);
+
+        // 리소스에서 불러오기
         Resources res = getResources();
         spinnerNames = res.getStringArray(R.array.maintaglist);
         tagImages = res.obtainTypedArray(R.array.tag_array);
@@ -202,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 tv_noList.setVisibility(View.GONE);
                 listView.setVisibility(View.VISIBLE);
+                tv_listFooter.setText(data.size() + "개의 연락처");
                 adapter = new AddressListAdapter(MainActivity.this, R.layout.address_list_layout, data);
                 listView.setAdapter(adapter);
             }
@@ -287,43 +295,44 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             TextView cmt = view.findViewById(R.id.tv_addresslist_cmt);
-
-            if (pre_cmt == null) {
+            if (position != data.size()) {
+                if (pre_cmt != null) {
+                    pre_cmt.setVisibility(View.GONE);
+                }
                 pre_cmt = cmt;
-            } else {
-                pre_cmt.setVisibility(View.GONE);
-                pre_cmt = cmt;
+                cmt.setVisibility(View.VISIBLE);
             }
-            cmt.setVisibility(View.VISIBLE);
         }
     };
 
     ListView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-            String[] options = {"전화걸기", "연락처 수정", "연락처 삭제"};
+            if (position != data.size()) {
+                String[] options = {"전화걸기", "연락처 수정", "연락처 삭제"};
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setItems(options, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case 0: // 전화걸기
-                            String tel = "tel:" + data.get(position).getAphone();
-                            startActivity(new Intent("android.intent.action.DIAL", Uri.parse(tel)));
-                            break;
-                        case 1: // 연락처 수정
-                            Intent updateIntent = new Intent(getApplicationContext(), UpdateActivity.class);
-                            updateIntent.putExtra("seq", data.get(position).getAseqno());
-                            startActivity(updateIntent);
-                            break;
-                        case 2: // 연락처 삭제
-                            deleteFromDB(data.get(position).getAseqno());
-                            break;
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0: // 전화걸기
+                                String tel = "tel:" + data.get(position).getAphone();
+                                startActivity(new Intent("android.intent.action.DIAL", Uri.parse(tel)));
+                                break;
+                            case 1: // 연락처 수정
+                                Intent updateIntent = new Intent(getApplicationContext(), UpdateActivity.class);
+                                updateIntent.putExtra("seq", data.get(position).getAseqno());
+                                startActivity(updateIntent);
+                                break;
+                            case 2: // 연락처 삭제
+                                deleteFromDB(data.get(position).getAseqno());
+                                break;
+                        }
                     }
-                }
-            });
-            builder.create().show();
+                });
+                builder.create().show();
+            }
             return true;
         }
     };

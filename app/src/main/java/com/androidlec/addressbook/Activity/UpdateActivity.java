@@ -56,6 +56,7 @@ public class UpdateActivity extends AppCompatActivity {
     private static final int IMAGE_PICK_GALLERY_CODE = 102;
     private Uri image_uri;
     private int mWhich;
+    private String mImageUrl = "";
 
     // 태그
     private int[] iv_tags = {R.id.add_iv_tagRed, R.id.add_iv_tagOrange, R.id.add_iv_tagYellow, R.id.add_iv_tagGreen, R.id.add_iv_tagBlue, R.id.add_iv_tagPurple, R.id.add_iv_tagGray};
@@ -206,6 +207,7 @@ public class UpdateActivity extends AppCompatActivity {
         et_comment.setText(address.getAmemo());
 
         String url = StaticData.BASE_URL + address.getAimage();
+        mImageUrl = address.getAimage();
 
         //이미지 보여주기
         Glide.with(UpdateActivity.this)
@@ -251,7 +253,7 @@ public class UpdateActivity extends AppCompatActivity {
             } else if (TextUtils.isEmpty(phone)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if (image_uri == null) {
-                updateToDB(UpdateActivity.this, "");
+                updateToDB(UpdateActivity.this, mImageUrl);
             } else {
                 try {
                     UpdateConnectFTP updateConnectFTP = new UpdateConnectFTP(UpdateActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
