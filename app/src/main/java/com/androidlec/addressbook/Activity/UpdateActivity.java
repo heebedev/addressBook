@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -38,7 +37,7 @@ import java.util.ArrayList;
 
 public class UpdateActivity extends AppCompatActivity {
 
-    private static String name, phone, email, comment, tagListString, seq;
+    private static String NAME, PHONE, EMAIL, COMMENT, TAG_LIST_STRING, SEQ;
     // xml
     private TextView tvbtregister, tvbtcancle;
     private ImageView ivAddImage;
@@ -46,7 +45,6 @@ public class UpdateActivity extends AppCompatActivity {
 
     // 스피너
     private String[] spinnerReNames;
-    private TypedArray spinnerImages;
 
     // 카메라, 이미지
     private static final int IMAGE_PICK_CAMERA_CODE = 101;
@@ -75,9 +73,9 @@ public class UpdateActivity extends AppCompatActivity {
         ivAddImage.setOnClickListener(onClickListener);
 
         Intent intent = getIntent();
-        seq = String.valueOf(intent.getIntExtra("seq", 0));
+        SEQ = String.valueOf(intent.getIntExtra("seq", 0));
 
-        getData(seq);
+        getData(SEQ);
 
     } // onCreate
 
@@ -143,7 +141,6 @@ public class UpdateActivity extends AppCompatActivity {
 
         Resources res = getResources();
         spinnerReNames = MainActivity.spinnerNames;
-        spinnerImages = res.obtainTypedArray(R.array.tag_array);
         spinnerReNames[0] = "태그 없음";
 
         for (int i = 0; i < iv_tags.length; i++) {
@@ -231,20 +228,20 @@ public class UpdateActivity extends AppCompatActivity {
     } // 가져온 데이터 나타내기
 
     private void updateData() {
-        name = et_name.getText().toString().trim();
-        phone = et_phone.getText().toString().trim();
-        email = et_email.getText().toString().trim();
-        comment = et_comment.getText().toString().trim();
+        NAME = et_name.getText().toString().trim();
+        PHONE = et_phone.getText().toString().trim();
+        EMAIL = et_email.getText().toString().trim();
+        COMMENT = et_comment.getText().toString().trim();
 
         if (tagSelectedOK()) {
-            tagListString = tagList.toString();
-            tagListString = tagListString.substring(1, tagListString.length() - 1); // 앞뒤 [] 제거
-            tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
+            TAG_LIST_STRING = tagList.toString();
+            TAG_LIST_STRING = TAG_LIST_STRING.substring(1, TAG_LIST_STRING.length() - 1); // 앞뒤 [] 제거
+            TAG_LIST_STRING = TAG_LIST_STRING.replace(" ", ""); // 중간 공백 제거
 
             // 빈칸, 유효성 검사
-            if (TextUtils.isEmpty(name)) {
+            if (TextUtils.isEmpty(NAME)) {
                 Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            } else if (TextUtils.isEmpty(phone)) {
+            } else if (TextUtils.isEmpty(PHONE)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if (image_uri == null) {
                 updateToDB(UpdateActivity.this, mImageUrl);
@@ -283,7 +280,7 @@ public class UpdateActivity extends AppCompatActivity {
     public static void updateToDB(Context mContext, String fileName) {
         String urlAddr = "http://192.168.0.79:8080/test/csUpdateAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tagListString + "&seq=" + seq;
+        urlAddr = urlAddr + "name=" + NAME + "&phone=" + PHONE + "&email=" + EMAIL + "&comment=" + COMMENT + "&fileName=" + fileName + "&tags=" + TAG_LIST_STRING + "&seq=" + SEQ;
 
         try {
             CSNetworkTask csNetworkTask = new CSNetworkTask(mContext, urlAddr);

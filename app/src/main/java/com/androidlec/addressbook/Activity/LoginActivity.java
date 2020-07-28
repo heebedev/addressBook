@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.putInt("seq", StaticData.USER_SEQ); // key, value를 이용하여 저장하는 형태
 
         editor.apply();
-    }
+    } // 자동 로그인
 
     private void getUSeqno(String uId) {
         String urlAddr = "http://192.168.0.178:8080/Test/uSeqno.jsp?";

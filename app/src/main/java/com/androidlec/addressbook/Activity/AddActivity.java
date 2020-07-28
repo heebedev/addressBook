@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 
 public class AddActivity extends AppCompatActivity {
 
-    private static String name, phone, email, comment, tagListString;
+    private static String NAME, PHONE, EMAIL, COMMENT, TAG_LIST_STRING;
     // xml
     private TextView tv_bt_register, tv_bt_cancel;
     private ImageView ivAddImage;
@@ -44,7 +43,6 @@ public class AddActivity extends AppCompatActivity {
 
     // 스피너
     private String[] spinnerReNames;
-    private TypedArray spinnerImages;
 
     // 카메라, 이미지
     private static final int IMAGE_PICK_CAMERA_CODE = 101;
@@ -131,7 +129,6 @@ public class AddActivity extends AppCompatActivity {
 
         Resources res = getResources();
         spinnerReNames = MainActivity.spinnerNames;
-        spinnerImages = res.obtainTypedArray(R.array.tag_array);
 
         spinnerReNames[0] = "태그 없음";
 
@@ -169,20 +166,20 @@ public class AddActivity extends AppCompatActivity {
     } // 이미지 보이기
 
     private void inputNewData() {
-        name = et_name.getText().toString().trim();
-        phone = et_phone.getText().toString().trim();
-        email = et_email.getText().toString().trim();
-        comment = et_comment.getText().toString().trim();
+        NAME = et_name.getText().toString().trim();
+        PHONE = et_phone.getText().toString().trim();
+        EMAIL = et_email.getText().toString().trim();
+        COMMENT = et_comment.getText().toString().trim();
 
         if (tagSelectedOK()) {
-            tagListString = tagList.toString();
-            tagListString = tagListString.substring(1, tagListString.length() - 1); // 앞뒤 [] 제거
-            tagListString = tagListString.replace(" ", ""); // 중간 공백 제거
+            TAG_LIST_STRING = tagList.toString();
+            TAG_LIST_STRING = TAG_LIST_STRING.substring(1, TAG_LIST_STRING.length() - 1); // 앞뒤 [] 제거
+            TAG_LIST_STRING = TAG_LIST_STRING.replace(" ", ""); // 중간 공백 제거
 
             // 빈칸, 유효성 검사
-            if (TextUtils.isEmpty(name)) {
+            if (TextUtils.isEmpty(NAME)) {
                 Toast.makeText(this, "이름을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            } else if (TextUtils.isEmpty(phone)) {
+            } else if (TextUtils.isEmpty(PHONE)) {
                 Toast.makeText(this, "전화번호를 입력해 주세요.", Toast.LENGTH_SHORT).show();
             } else if (image_uri == null) {
                 uploadToDB(AddActivity.this, "");
@@ -221,12 +218,12 @@ public class AddActivity extends AppCompatActivity {
     public static void uploadToDB(Context mContext, String fileName) {
         String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
 
-        urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tagListString + "&userId=" + StaticData.USER_ID + "&userSeq=" + StaticData.USER_SEQ;
+        urlAddr = urlAddr + "name=" + NAME + "&phone=" + PHONE + "&email=" + EMAIL + "&comment=" + COMMENT + "&fileName=" + fileName + "&tags=" + TAG_LIST_STRING + "&userId=" + StaticData.USER_ID + "&userSeq=" + StaticData.USER_SEQ;
 
         try {
             CSNetworkTask csNetworkTask = new CSNetworkTask(mContext, urlAddr);
             csNetworkTask.execute(); // doInBackground 의 리턴값
-            Toast.makeText(mContext, name + " 연락처를 추가했습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, NAME + " 연락처를 추가했습니다.", Toast.LENGTH_SHORT).show();
             ((Activity) mContext).finish();
         } catch (Exception e) {
             e.printStackTrace();
