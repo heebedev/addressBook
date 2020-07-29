@@ -56,7 +56,7 @@ public class LJH_SettingActivity extends AppCompatActivity {
     private void changePw() {
         String newPw = et_password.getText().toString();
 
-        urlAddr = "http://192.168.0.178:8080/Test/changePw.jsp?";
+        urlAddr = StaticData.DB_URL + "hangePw.jsp?";
         urlAddr = urlAddr + "id=" + StaticData.USER_ID + "&pw=" + newPw;
 
         connectChangePwData();
@@ -72,7 +72,7 @@ public class LJH_SettingActivity extends AppCompatActivity {
     } // 비밀번호 변경 액션
 
     private void deleteId() {
-        urlAddr = "http://192.168.0.178:8080/Test/deleteId.jsp?";
+        urlAddr = StaticData.DB_URL + "deleteId.jsp?";
         urlAddr = urlAddr + "id=" + StaticData.USER_ID;
 
         connectDeleteIdData();

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.androidlec.addressbook.LJH.LJH_InsertNetworkTask;
 import com.androidlec.addressbook.LJH.LJH_LoginNetworkTask;
 import com.androidlec.addressbook.R;
+import com.androidlec.addressbook.StaticData;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -97,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
     } // 비밀번호, 비밀번호 확인 체크
 
     private void idDoubleChk() {
-        String urlAddr = "http://192.168.0.178:8080/Test/idDoubleChk.jsp?";
+        String urlAddr = StaticData.DB_URL + "idDoubleChk.jsp?";
         urlAddr = urlAddr + "id=" + regId;
 
         try {
@@ -116,10 +117,10 @@ public class RegisterActivity extends AppCompatActivity {
     } // 아이디 중복 체크
 
     private void register() {
-        String urlAddr = "http://192.168.0.178:8080/Test/register.jsp?";
+        String urlAddr = StaticData.DB_URL + "register.jsp?";
         urlAddr = urlAddr + "id=" + regId + "&pw=" + regPw;
 
-        String urlAddrTag = "http://192.168.0.178:8080/Test/tagInsert.jsp?id=" + regId;
+        String urlAddrTag = StaticData.DB_URL + "tagInsert.jsp?id=" + regId;
 
         connectRegisterData(urlAddr);
         connectTagInsertData(urlAddrTag);

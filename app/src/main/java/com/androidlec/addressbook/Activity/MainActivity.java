@@ -59,8 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private TextView tv_listFooter;
 
-    // datajsp
-    private String centIP, urlAddr;
+    String urlAddr;
 
     // 플로팅버튼
     private FloatingActionButton fladdBtn;
@@ -165,8 +164,6 @@ public class MainActivity extends AppCompatActivity {
 
         actionBar = getSupportActionBar();
         data = new ArrayList<>();
-
-        centIP = "192.168.0.138";
     } // 초기화
 
     private void Spinner_List() {
@@ -181,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_select.jsp?userid=" + StaticData.USER_ID;
+                    urlAddr = StaticData.DB_URL + "address_list_select.jsp?userid=" + StaticData.USER_ID;
                     spinnerPosition = 0;
                 } else {
-                    urlAddr = "http://" + centIP + ":8080/test/address_list_selectedspinner.jsp?userid=" + StaticData.USER_ID + "&aTag=" + position;
+                    urlAddr = StaticData.DB_URL + "address_list_selectedspinner.jsp?userid=" + StaticData.USER_ID + "&aTag=" + position;
                     spinnerPosition = position;
                 }
                 connectGetData();
@@ -220,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
     }  // connectGetData
 
     private void onTagList() {
-        urlAddr = "http://192.168.0.178:8080/Test/tagList.jsp?";
+        urlAddr = StaticData.DB_URL + "tagList.jsp?";
         urlAddr = urlAddr + "id=" + StaticData.USER_ID;
 
         try {
@@ -242,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
     } // 태그 리스트 불러오기
 
     private void deleteFromDB(int seq) {
-        String urlAddr = "http://192.168.0.79:8080/test/csDeleteAddressBook.jsp?";
+        String urlAddr = StaticData.DB_URL + "csDeleteAddressBook.jsp?";
 
         urlAddr = urlAddr + "seq=" + seq;
 
@@ -268,9 +265,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onQueryTextSubmit(String query) {
             if (spinnerPosition == 0) {
-                urlAddr = "http://" + centIP + ":8080/test/address_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query;
+                urlAddr = StaticData.DB_URL + "address_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query;
             } else {
-                urlAddr = "http://192.168.0.79:8080/test/csAddress_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query + "&aTag=" + spinnerPosition;
+                urlAddr = StaticData.DB_URL + "csAddress_list_search.jsp?userid=" + StaticData.USER_ID + "&search=" + query + "&aTag=" + spinnerPosition;
             }
             connectGetData();
             return false;

@@ -188,7 +188,7 @@ public class AddActivity extends AppCompatActivity {
                 uploadToDB(AddActivity.this, "");
             } else {
                 try {
-                    AddConnectFTP addConnectFTP = new AddConnectFTP(AddActivity.this, "192.168.0.82", "host", "qwer1234", 25, image_uri);
+                    AddConnectFTP addConnectFTP = new AddConnectFTP(AddActivity.this, StaticData.DB_URL, "host", "qwer1234", 25, image_uri);
                     addConnectFTP.execute();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -219,7 +219,7 @@ public class AddActivity extends AppCompatActivity {
     } // 태그 리스트
 
     public static void uploadToDB(Context mContext, String fileName) {
-        String urlAddr = "http://192.168.0.79:8080/test/csAddAddressBook.jsp?";
+        String urlAddr = StaticData.DB_URL + "csAddAddressBook.jsp?";
 
         urlAddr = urlAddr + "name=" + name + "&phone=" + phone + "&email=" + email + "&comment=" + comment + "&fileName=" + fileName + "&tags=" + tagListString + "&userId=" + StaticData.USER_ID + "&userSeq=" + StaticData.USER_SEQ;
 

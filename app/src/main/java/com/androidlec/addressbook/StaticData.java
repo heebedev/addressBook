@@ -9,7 +9,8 @@ public class StaticData {
     public static final long FINISH_INTERVAL_TIME = 2000;
 
     // URL
-    public static String BASE_URL = "http://192.168.0.82:8080/Hello/imgs/";
+    public static String DB_URL = "http://192.168.0.89:8080/address/";
+    public static String BASE_URL = "http://192.168.0.89:8080/address/imgs/";
 
     public static String FILE_NAME = "";
 }

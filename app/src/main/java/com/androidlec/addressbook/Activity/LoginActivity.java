@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
     } // Id, Pw 유효성검사
 
     private void connectLoginData(String uId, String uPw) {
-        String urlAddr = "http://192.168.0.178:8080/Test/loginChk.jsp?";
+        String urlAddr = StaticData.DB_URL + "loginChk.jsp?";
         urlAddr = urlAddr + "id=" + uId + "&pw=" + uPw;
 
         try {
@@ -141,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getUSeqno(String uId) {
-        String urlAddr = "http://192.168.0.178:8080/Test/uSeqno.jsp?";
+        String urlAddr = StaticData.DB_URL + "uSeqno.jsp?";
         urlAddr = urlAddr + "id=" + uId;
 
         try {
