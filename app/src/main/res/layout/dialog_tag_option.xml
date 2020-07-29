@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#eeeeee"
-    android:orientation="vertical"
     android:layout_width="350dp"
     android:layout_height="wrap_content"
-    tools:context=".TagOptionDialog">
+    android:background="#eeeeee"
+    android:orientation="vertical"
+    tools:context=".CS.TagOptionDialog">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,19 +15,19 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="태그명 변경"
-            android:textSize="20sp"
-            android:textColor="#fff"
+            android:background="@color/black"
             android:gravity="center"
-            android:background="@color/black"/>
+            android:text="태그명 변경"
+            android:textColor="#fff"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="10dp">
 
         <include layout="@layout/tag_option_body" />
@@ -37,7 +37,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#555"/>
+        android:background="#555" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,27 +48,27 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:text="취소"
-            android:textSize="15sp"
-            android:textStyle="bold"
             android:textColor="@color/black"
-            android:background="?attr/selectableItemBackground"/>
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="#555"/>
+            android:background="#555" />
 
         <Button
             android:id="@+id/dialog_tag_option_btn_submit"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:text="변경"
-            android:textSize="15sp"
-            android:textStyle="bold"
             android:textColor="@color/black"
-            android:background="?attr/selectableItemBackground"/>
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

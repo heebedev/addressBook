@@ -1,4 +1,4 @@
-package com.androidlec.addressbook.adapter_sh;
+package com.androidlec.addressbook.SH_adapter;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,15 +16,13 @@ import com.androidlec.addressbook.R;
 
 public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
-    String[] spinnerNames;
-    TypedArray spinnerImages;
-    Context mContext;
-    LayoutInflater inflater;
-
+    private String[] spinnerNames;
+    private TypedArray spinnerImages;
+    private Context mContext;
+    private LayoutInflater inflater;
 
     public CustomSpinnerAdapter(@NonNull Context context, String[] names, TypedArray images) {
         super(context, R.layout.spinner_row);
-
         this.spinnerNames = names;
         this.spinnerImages = images;
         this.mContext = context;
@@ -49,16 +47,13 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
         ViewHolder mViewHolder = new ViewHolder();
 
         if (convertView == null) {
-
             LayoutInflater mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.spinner_row, parent, false);
 
-            mViewHolder.mImage = (ImageView) convertView.findViewById(R.id.iv_spn_tag_image);
-            mViewHolder.mName = (TextView) convertView.findViewById(R.id.tv_spn_tag_name);
+            mViewHolder.mImage = convertView.findViewById(R.id.iv_spn_tag_image);
+            mViewHolder.mName = convertView.findViewById(R.id.tv_spn_tag_name);
             convertView.setTag(mViewHolder);
-
         } else {
-
             mViewHolder = (ViewHolder) convertView.getTag();
         }
 
@@ -69,7 +64,6 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     }
 
     private static class ViewHolder {
-
         ImageView mImage;
         TextView mName;
     }

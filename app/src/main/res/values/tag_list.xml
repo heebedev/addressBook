@@ -9,7 +9,6 @@
         <item>파란색</item>
         <item>보라색</item>
         <item>회색</item>
-
     </string-array>
 
     <string-array name="addaddresstaglist">
@@ -21,8 +20,6 @@
         <item>파란색</item>
         <item>보라색</item>
         <item>회색</item>
-
     </string-array>
-
 
 </resources>

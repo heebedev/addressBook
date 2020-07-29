@@ -1,8 +1,11 @@
-package com.androidlec.addressbook.FTP_JHJ;
+package com.androidlec.addressbook.JHJ_FTP;
+
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.androidlec.addressbook.Activity.UpdateActivity;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -11,18 +14,20 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ConnectFTP extends AsyncTask<Integer, String, String> {
+public class UpdateConnectFTP extends AsyncTask<Integer, String, String> {
 
-    public FTPClient mFTPClient = null;
+    private FTPClient mFTPClient;
 
-    Context context;
-    String host;
-    String username;
-    String password;
-    int port;
-    Uri file;
+    private Context context;
+    private String host;
+    private String username;
+    private String password;
+    private int port;
+    private Uri file;
 
-    public ConnectFTP(Context context, String host, String username, String password, int port, Uri file) {
+    private ProgressDialog progressDialog;
+
+    public UpdateConnectFTP(Context context, String host, String username, String password, int port, Uri file) {
         this.context = context;
         this.host = host;
         this.username = username;
@@ -33,11 +38,26 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
     }
 
     @Override
+    protected void onPreExecute() {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+    }
+
+    @Override
+    protected void onPostExecute(String formatDate) {
+        super.onPostExecute(formatDate);
+        UpdateActivity.updateToDB(context, formatDate);
+        progressDialog.dismiss();
+    }
+
+    @Override
     protected String doInBackground(Integer... integers) {
         String formatDate = "";
 
         // FTP 접속 체크
-        boolean status = false;
+        boolean status;
         // FTP 접속 시
         if (status = ftpConnect(host, username, password, port)) {
             String currentPath = ftpGetDirectory() + "imgs";
@@ -52,19 +72,17 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
             formatDate = sdfNow.format(date);
 
             // 파일 업로드시
-            if (ftpUploadFile(file, formatDate+".jpg", currentPath)) {
-                Log.v("ConnectFTP", "Success");
-            }
+            ftpUploadFile(file, formatDate + ".jpg", currentPath);
         }
 
         if (status) {
             ftpDisconnect();
         }
 
-        return formatDate+".jpg";
+        return formatDate + ".jpg";
     }
 
-    public boolean ftpConnect(String host, String username, String password, int port) {
+    private boolean ftpConnect(String host, String username, String password, int port) {
         boolean result = false;
 
         try {
@@ -80,7 +98,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
         return result;
     }
 
-    public boolean ftpDisconnect() {
+    private boolean ftpDisconnect() {
         boolean result = false;
 
         try {
@@ -93,7 +111,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
         return result;
     }
 
-    public String ftpGetDirectory() {
+    private String ftpGetDirectory() {
         String directory = null;
         try {
             directory = mFTPClient.printWorkingDirectory();
@@ -103,7 +121,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
         return directory;
     }
 
-    public boolean ftpChangeDirectory(String directory) {
+    private boolean ftpChangeDirectory(String directory) {
         try {
             mFTPClient.changeWorkingDirectory(directory);
             return true;
@@ -114,7 +132,7 @@ public class ConnectFTP extends AsyncTask<Integer, String, String> {
     }
 
     //                                     저장할 파일 이름        저장할 FTP 폴더 경
-    public boolean ftpUploadFile(Uri file, String desFileName, String desDriectroy) {
+    private boolean ftpUploadFile(Uri file, String desFileName, String desDriectroy) {
         boolean result = false;
         try {
             InputStream fis = context.getContentResolver().openInputStream(file);

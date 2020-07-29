@@ -1,38 +1,32 @@
-package com.androidlec.addressbook;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.androidlec.addressbook.LJH;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.androidlec.addressbook.Activity.LoginActivity;
+import com.androidlec.addressbook.Activity.MainActivity;
+import com.androidlec.addressbook.Activity.RegisterActivity;
+import com.androidlec.addressbook.R;
+import com.androidlec.addressbook.StaticData;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class LJH_SettingActivity extends AppCompatActivity {
 
+    // xml
     private TextInputEditText et_id, et_password;
     private Button btn_change, btn_delete;
-    String TAG = "Log Chk : ";
-    String urlAddr;
-    LJH_data ljh_data;
 
-    private void init() {
-        et_id = findViewById(R.id.setting_et_id);
-        et_password = findViewById(R.id.setting_et_password);
-        btn_change = findViewById(R.id.setting_btn_change);
-        btn_delete = findViewById(R.id.setting_btn_delete);
-
-        et_id.setText(ljh_data.getLoginId());
-    }
+    // 네트워크 주소
+    private String urlAddr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +42,67 @@ public class LJH_SettingActivity extends AppCompatActivity {
         // 클릭 리스너
         btn_change.setOnClickListener(onClickListener);
         btn_delete.setOnClickListener(onClickListener);
-    }
+    } // onCreate
+
+    private void init() {
+        et_id = findViewById(R.id.setting_et_id);
+        et_password = findViewById(R.id.setting_et_password);
+        btn_change = findViewById(R.id.setting_btn_change);
+        btn_delete = findViewById(R.id.setting_btn_delete);
+
+        et_id.setText(StaticData.USER_ID);
+    } // 초기화
+
+    private void changePw() {
+        String newPw = et_password.getText().toString();
+
+        urlAddr = "http://192.168.0.178:8080/Test/changePw.jsp?";
+        urlAddr = urlAddr + "id=" + StaticData.USER_ID + "&pw=" + newPw;
+
+        connectChangePwData();
+    } // 비밀번호 변경
+
+    private void connectChangePwData() {
+        try {
+            LJH_InsertNetworkTask changePwNetworkTask = new LJH_InsertNetworkTask(LJH_SettingActivity.this, urlAddr);
+            changePwNetworkTask.execute().get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } // 비밀번호 변경 액션
+
+    private void deleteId() {
+        urlAddr = "http://192.168.0.178:8080/Test/deleteId.jsp?";
+        urlAddr = urlAddr + "id=" + StaticData.USER_ID;
+
+        connectDeleteIdData();
+    } // 회원 탈퇴
+
+    private void connectDeleteIdData() {
+        try {
+            LJH_InsertNetworkTask deleteIdNetworkTask = new LJH_InsertNetworkTask(LJH_SettingActivity.this, urlAddr);
+            deleteIdNetworkTask.execute().get();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } // 회원 탈퇴 액션
+
+    private void removeAutoLogin() {
+        SharedPreferences sharedPreferences = getSharedPreferences("sFile", MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("autoLogin", false); // key, value를 이용하여 저장하는 형태
+
+        editor.apply();
+    } // 자동로그인 데이터 지우기
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.v(TAG, "onClick()");
-
             switch (v.getId()) {
                 case R.id.setting_btn_change:
+                    removeAutoLogin();
                     changePw();
                     Toast.makeText(LJH_SettingActivity.this, "비밀번호가 변경되었습니다.", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(LJH_SettingActivity.this, MainActivity.class));
@@ -71,8 +117,9 @@ public class LJH_SettingActivity extends AppCompatActivity {
                             .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    removeAutoLogin();
                                     deleteId();
-                                    startActivity(new Intent(LJH_SettingActivity.this, RegisterActivity.class));
+                                    startActivity(new Intent(LJH_SettingActivity.this, LoginActivity.class));
                                     Toast.makeText(LJH_SettingActivity.this, "그동안 이용해주셔서 감사합니다.", Toast.LENGTH_LONG).show();
                                     finish();
                                 }
@@ -84,50 +131,5 @@ public class LJH_SettingActivity extends AppCompatActivity {
             }
         }
     };
-
-
-    private void changePw(){
-        Log.v(TAG, "changePw()");
-
-        String newPw = et_password.getText().toString();
-
-        urlAddr = "http://192.168.0.178:8080/Test/changePw.jsp?";
-        urlAddr = urlAddr + "id=" + ljh_data.getLoginId() + "&pw=" + newPw;
-        Log.v(TAG, urlAddr);
-
-        connectChangePwData();
-    }
-
-    private void connectChangePwData(){
-        try{
-            LJH_InsertNetworkTask changePwNetworkTask = new LJH_InsertNetworkTask(LJH_SettingActivity.this, urlAddr);
-            changePwNetworkTask.execute().get();
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-    private void deleteId(){
-        Log.v(TAG, "changePw()");
-
-        urlAddr = "http://192.168.0.178:8080/Test/deleteId.jsp?";
-        urlAddr = urlAddr + "id=" + ljh_data.getLoginId();
-        Log.v(TAG, urlAddr);
-
-        connectDeleteIdData();
-    }
-
-    private void connectDeleteIdData(){
-        try{
-            LJH_InsertNetworkTask deleteIdNetworkTask = new LJH_InsertNetworkTask(LJH_SettingActivity.this, urlAddr);
-            deleteIdNetworkTask.execute().get();
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
 
 }//----

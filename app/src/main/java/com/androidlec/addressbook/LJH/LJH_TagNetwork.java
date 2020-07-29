@@ -1,9 +1,8 @@
-package com.androidlec.addressbook;
+package com.androidlec.addressbook.LJH;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,21 +16,21 @@ import java.util.ArrayList;
 
 public class LJH_TagNetwork extends AsyncTask<Integer, String, Object> {
 
-    Context context;
-    String mAddr;
-    ArrayList<String> tNames;
-    ProgressDialog progressDialog;
+    private Context context;
+    private String mAddr;
+    private ArrayList<String> tNames;
+    private ProgressDialog progressDialog;
 
     public LJH_TagNetwork(Context context, String mAddr) {
         this.context = context;
         this.mAddr = mAddr;
-        this.tNames = new ArrayList<String>();
+        this.tNames = new ArrayList<>();
     }
 
     @Override
     protected void onPreExecute() {
         progressDialog = new ProgressDialog(context);
-        progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setTitle("Dialog");
         progressDialog.setMessage("Get...");
         progressDialog.show();
@@ -60,20 +59,20 @@ public class LJH_TagNetwork extends AsyncTask<Integer, String, Object> {
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
 
-        try{
+        try {
             URL url = new URL(mAddr);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setConnectTimeout(10000); // 10 seconds.
 
-            if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+            if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 
                 inputStream = httpURLConnection.getInputStream(); // 이때 데이터 가져오는 겁니다.
                 inputStreamReader = new InputStreamReader(inputStream); // 가져온거를 리더에 넣어야겠죠.
                 bufferedReader = new BufferedReader(inputStreamReader); // 버퍼드리더에 넣어야합니다.
 
-                while (true){
+                while (true) {
                     String strline = bufferedReader.readLine();
-                    if(strline == null) break; // 브레이크 만나면 와일문 빠져나간다.
+                    if (strline == null) break; // 브레이크 만나면 와일문 빠져나간다.
                     stringBuffer.append(strline + "\n");
                 } // 와일문 끝나면 다 가져왔다~.
 
@@ -81,14 +80,14 @@ public class LJH_TagNetwork extends AsyncTask<Integer, String, Object> {
                 parser(stringBuffer.toString()); // 아직 안만들었어요~~~ But, 파씽 하겠다~.
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             try {
-                if(bufferedReader != null) bufferedReader.close();
-                if(inputStreamReader != null) inputStreamReader.close();
-                if(inputStream != null) inputStream.close();
-            }catch (Exception e){
+                if (bufferedReader != null) bufferedReader.close();
+                if (inputStreamReader != null) inputStreamReader.close();
+                if (inputStream != null) inputStream.close();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -97,22 +96,21 @@ public class LJH_TagNetwork extends AsyncTask<Integer, String, Object> {
     }
 
 
-
-    private void parser(String s){ // 스트링 하나만 가져오죠.
+    private void parser(String s) { // 스트링 하나만 가져오죠.
 
         try {
             JSONObject jsonObject = new JSONObject(s);
             JSONArray jsonArray = new JSONArray(jsonObject.getString("tag")); // students_info 에 있는걸 가져와라.
             tNames.clear(); // 깨끗하게.
 
-            for(int i=0; i<jsonArray.length(); i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject1 = (JSONObject) jsonArray.get(i);
                 String tName = jsonObject1.getString("tName");
 
                 tNames.add(tName);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
